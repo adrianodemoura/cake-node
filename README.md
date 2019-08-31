@@ -66,7 +66,7 @@ LOCALGES = variáveis de idioma.
 
 /salvar 	- Inclui ou Atualiza um registro do cadastro.
 
-/sac/meu_token 	- Retorna o token do cliente.
+/mac/meu_token 	- Retorna o token do cliente.
 
 ```
 * inclua o parâmetro `doc` para receber a documentação de cada rota.
@@ -84,7 +84,7 @@ LOCALGES = variáveis de idioma.
 
 * core: Conjunto de códigos que formam o coração do CakeNode, não é aconselhável a sua alteração, mas sim sua leitura.
 
-* sac: é o módulo, exemplo, de autenticação centralizada, é através deste módulo que são cadastrados os usuários da aplicação.
+* mac: é o módulo, exemplo, de autenticação centralizada, é através deste módulo que são cadastrados os usuários da aplicação.
 
 ### Recomendações
 
