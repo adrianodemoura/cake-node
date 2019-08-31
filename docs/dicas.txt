@@ -1,0 +1,71 @@
+## replace
+let vlr = '123.456.789-13'
+const unMask = mask.replace(/[#]/g,'')
+
+//vlr = vlr.toString().replace(/\.|,|-|\(||\)/g,'')
+
+//vlr = vlr.toString().split('').filter((letra) => unMask.indexOf(letra) === -1).join('')
+
+vlr = vlr.toString().match(/\d/g).join('')
+
+ ## referëncias:
+- https://expressjs.com/pt-br/advanced/best-practice-security.html
+- https://techoverflow.net/2018/09/19/fixing-nodejs-intl-datetimeformat-not-formatting-properly-for-locales/
+- https://blog.grossman.io/how-to-write-async-await-without-try-catch-blocks-in-javascript/
+
+// salve no package.json
+$ npm install dateformat --save 
+
+for (var i = 0; i < itens.length; i++) MELHOR itens.includes(6)
+
+if (foo !== null && foo !== undefined && foo !== "") MELHOR if (!!foo)
+
+"JavaScript".substr(4, 6); // "Script" Substr(index, qtd)
+
+"JavaScript".substring(4, 6); // "Sc" substring(start, end)
+
+const array = [1, 2, 3, 4, 5]; array.push(array.shift()); console.log(array); // [2, 3, 4, 5, 1];
+
+const array = [1,2,3,3,3,4,5,6]; const uniqList = unique(array); console.log(uniqList); // [1,2,3,4,5,6];
+
+$ curl -X GET -G http://10.181.79.77:3000/minha_chave/ -d email=api@api.com.br -d senha=api
+
+$ echo "db.usuarios.findOne()" | mongo apinode | grep chave_api | cut -d' ' -f3 | sed 's/[",]//g'
+$ echo "db.municipios.findOne()" | mongo apinode | grep _id | cut -d' ' -f3 | sed 's/[ObjectId("),]//g'
+
+$ export fkUsuario='curl -X GET -G http://localhost:3000/fake_usuarios'
+$ for i in {0..100}; do echo `$fkUsuario`; done
+
+// Limpando o cadastro de municípios e usuários.
+ModelMunicipio.find().deleteMany().exec()
+ModelUsuario.find().deleteMany().exec()
+
+// nodeJs e mysql
+https://codeforgeek.com/nodejs-mysql-tutorial/
+
+// conexão com mysql
+async function connect() {
+    try {
+        await new Promise((resolve, reject) => {
+            connection.connect(function(err) {
+            	if (!!!err) {
+            		console.log('Mysql conectado ...')
+            	} else {
+            		console.log('Erro ao conectar Mysql !!!')
+            	}
+				return err ? reject(err) : resolve()
+			})
+        })
+    } catch(err) {
+        console.log(err.message)
+        return err.message
+    }
+}
+connect()
+
+CREATE DATABASE cakenode_bd CHARACTER SET UTF8;
+GRANT ALL PRIVILEGES ON cakenode_bd.* TO cakenode_us@localhost IDENTIFIED BY 'cakenode_67' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+retorno.data    = new Intl.DateTimeFormat('pt-BR').format(new Date())
+retorno.valor   = new Intl.NumberFormat('pt-BR').format(1549.48)
