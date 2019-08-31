@@ -1,0 +1,14 @@
+tmp/**/*
+!tmp/empty
+
+node_modules/*
+
+.env
+.DS_Store
+
+composer.lock
+composer-lock.json
+package-lock.json
+cakenode.bd-journal
+cakenode.bd
+
