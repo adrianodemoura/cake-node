@@ -270,7 +270,7 @@ class Finder extends Behavior {
                 throw new Error(__('Campos do lado direito inválidos!'))
             }
 
-            sql = 'SELECT DISTINCT fieldsRight FROM tableRight aliasRight'
+            sql = 'SELECT fieldsRight FROM tableRight aliasRight'
 
             if (params.tableBridge) {
                 sql += ' LEFT JOIN tableBridge aliasBridge ON aliasBridge.foreignKeyBridgeRight = aliasRight.foreignKeyRight'
