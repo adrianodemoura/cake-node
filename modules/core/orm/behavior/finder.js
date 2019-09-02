@@ -633,33 +633,50 @@ class Finder extends Behavior {
                 throw new Error('04 - '+__('O parâmetro fields não é um array !'))
             }
 
+            // configurando as associações
+            let sqlJoin = await this.getSqlJoin(params.associations)
+
             // renomeando campo a campo
             let newsFields = []
             for (let loop in params.fields) {
-                let field       = params.fields[loop]
                 let alias       = this.alias
-                let aliasField  = this.getAliasField(field, this.schema[field], alias)
+                let field       = params.fields[loop]
+                if (field.indexOf('.') > -1) {
+                    const arrField  = field.split('.')
+                    alias           = arrField[0].capitalize()
+                    field           = arrField[1].toLowerCase()
+                }
+                const schemaField   = this.schema[field] || {}
 
-                if (this.schema[field]) {
-                    if (!params.fieldHidden) {
-                        let hidden = this.schema[field].hidden || false
-                        hidden = !!!this.schema[field].pk ? hidden : false
-                        if (hidden) {
-                            continue
-                        }
+                if (!params.fieldHidden) {
+                    let hidden = schemaField.hidden || false
+                    hidden = !!!schemaField.pk ? hidden : false
+                    if (hidden) {
+                        continue
                     }
                 }
 
-                if (!!!this.schema[field]) {
-                    //console.log('pulei: '+field+' '+aliasField)
+                if (this.schema[field] && alias === this.alias) {
+                    //console.log('achei: '+alias+'.'+field)
+                } else {
+                    let salvo = false
+                    if (sqlJoin.hasOne) {
+                        for(let loopHo in sqlJoin.hasOne) {
+                            if (sqlJoin.hasOne[loopHo].indexOf(' '+alias+' ') > -1) {
+                                salvo = true
+                            }
+                        }
+                    }
+                    if (! salvo) {
+                        throw new Error('05 - '+__('Campo %'+params.fields[loop]+'% inválido!'))
+                    }
                 }
+                
+                let aliasField  = this.getAliasField(field, schemaField, alias)
 
                 newsFields.push(aliasField)
             }
             params.fields = newsFields
-
-            // configurando as associações
-            let sqlJoin = await this.getSqlJoin(params.associations)
 
             // executando o count
             if (!noCount) {

@@ -32,9 +32,8 @@ module.exports = async function(params) {
             associations: ['Perfis', 'Unidades', 'Municipio'], 
             where: {'token':token}
         })
-        gravaLog(dataUsuario, 'dataUsuario')
         if (!dataUsuario) {
-            throw new Error(__('O Token informado não pertence a nenhum usuário!'))
+            throw new Error(Usuarios.error)
         }
         if (!!!dataUsuario) {
             throw new Error(__('%Token% inválido!'))
