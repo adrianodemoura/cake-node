@@ -42,6 +42,20 @@ class Finder extends Behavior {
     }
 
     /**
+     * Retorna o nome de um campo com base no seu alias
+     *
+     * @param   {String}  aliasField    No formato AliasField
+     * @return  {String}  fieldName     Nome do campo, que esteja no atributo this.schema
+     */
+    getFieldName (aliasField='') {
+      let fieldName   = aliasField
+      const arrFields = aliasField.replace(/([A-Z])/g, ' $1').trim().replace(' ','.').replace(' ','_').toLowerCase().split('.')
+      fieldName       = arrFields[1] || ''
+
+      return fieldName
+    }
+
+    /**
      * Retorna o alias de um campo.
      *
      * @param   {String}    field           Nome do campo a ser formatado.
@@ -57,13 +71,12 @@ class Finder extends Behavior {
 
         if (field.indexOf('.')>-1) {
             let arrField    = field.split('.')
-            aliasField      = field+' AS '+arrField[0]+arrField[1].capitalize().humanize()
+            aliasField      = field.capitalize()+' AS '+arrField[0].capitalize()+arrField[1].capitalize().humanize()
         } else {
-            aliasField      = alias+'.'+field+' AS '+alias+field.capitalize().humanize()
+            aliasField      = alias.capitalize()+'.'+field+' AS '+alias.capitalize()+field.capitalize().humanize()
         }
 
         if (useMask) {
-
             if (this.db.typesDate.indexOf(typeField) > -1) {
                 let arrField        = aliasField.split('AS')
                 let dateFormat      = this.db.dateFormat        || ''
@@ -510,22 +523,24 @@ class Finder extends Behavior {
 
             // parâmetros obrigatório para a pesquisa
             params.limit        = params.limit          || 10
-            params.type         = params.type           || 'all'
             params.page         = params.page           || 1
             params.fieldHidden  = params.fieldHidden    || 0
-            params.recursive    = params.recursive      || 2
+            params.type         = params.type           || 'all'
+            params.fields       = params.fields         || []
+            params.associations = params.associations   || []
+            params.group        = params.group          || []
             params.table        = this.table
             params.alias        = this.alias
             params.fieldsType   = this.fieldsType
 
             // validando os parâmetros
-            if (params.fields && params.fields.constructor.name !== 'Array') {
+            if (params.fields.constructor.name !== 'Array') {
                 throw new Error('01 - '+__('O parâmetro %fields% deve ser do tipo %array%!'))
             }
-            if (params.group && params.group.constructor.name !== 'Array') {
+            if (params.group.constructor.name !== 'Array') {
                 throw new Error('02 - '+__('O parâmetro %group% deve ser do tipo %array%!'))
             }
-            if (params.associations && params.associations.constructor.name !== 'Array') {
+            if (params.associations.constructor.name !== 'Array') {
                 throw new Error('03 - '+__('O parâmetro %associations% deve ser do tipo %array%!'))
             }
 
@@ -580,32 +595,32 @@ class Finder extends Behavior {
             }
 
             // se não tem fields
-            if (!!!params.fields) {
+            if (! params.fields.length ) {
                 params.fields = []
                 for (let field in this.schema) { // pegados da table corrente
                     params.fields.push(field)
                 }
-                if (params.associations && params.recursive>0) { // pega todos da associação hasOne, se o rersive é maior que 0.
-                    for (let loop in params.associations) {
-                        let Association = params.associations[loop].capitalize()
-                        if (this.associations[Association].hasOne) {
 
-                            let moduleRight = this.associations[Association].hasOne.table || ''
-                            if (moduleRight.length) {
-                                let tableHasOne = await getTable(moduleRight)
-                                let fieldsAssoc = this.associations[Association].hasOne.fields || []
-                                if (!!!fieldsAssoc.length) {
-                                    for(let field in tableHasOne.schema) {
-                                        fieldsAssoc.push(field)
-                                    }
+                // pega todos da associação hasOne
+                for (let loop in params.associations) {
+                    let Association = params.associations[loop].capitalize()
+                    if (this.associations[Association].hasOne) {
+
+                        let moduleRight = this.associations[Association].hasOne.table || ''
+                        if (moduleRight.length) {
+                            let tableHasOne = await getTable(moduleRight)
+                            let fieldsAssoc = this.associations[Association].hasOne.fields || []
+                            if (!!!fieldsAssoc.length) {
+                                for(let field in tableHasOne.schema) {
+                                    fieldsAssoc.push(field)
                                 }
+                            }
 
-                                for (let l in fieldsAssoc) {
-                                    let hidden  = tableHasOne.schema[fieldsAssoc[l]].hidden || false
-                                    hidden      = tableHasOne.schema[fieldsAssoc[l]].pk ? hidden : false
-                                    if (!hidden) {
-                                        params.fields.push(tableHasOne.alias+'.'+fieldsAssoc[l])
-                                    }
+                            for (let l in fieldsAssoc) {
+                                let hidden  = tableHasOne.schema[fieldsAssoc[l]].hidden || false
+                                hidden      = tableHasOne.schema[fieldsAssoc[l]].pk ? hidden : false
+                                if (!hidden) {
+                                    params.fields.push(tableHasOne.alias+'.'+fieldsAssoc[l])
                                 }
                             }
                         }
@@ -622,16 +637,21 @@ class Finder extends Behavior {
             let newsFields = []
             for (let loop in params.fields) {
                 let field       = params.fields[loop]
-                if (!!!this.schema[field]) { continue }
+                let alias       = this.alias
+                let aliasField  = this.getAliasField(field, this.schema[field], alias)
 
-                let aliasField  = this.getAliasField(field, this.schema[field])
-
-                if (!params.fieldHidden) {
-                    let hidden = this.schema[field].hidden || false
-                    hidden = !!!this.schema[field].pk ? hidden : false
-                    if (hidden) {
-                        continue
+                if (this.schema[field]) {
+                    if (!params.fieldHidden) {
+                        let hidden = this.schema[field].hidden || false
+                        hidden = !!!this.schema[field].pk ? hidden : false
+                        if (hidden) {
+                            continue
+                        }
                     }
+                }
+
+                if (!!!this.schema[field]) {
+                    //console.log('pulei: '+field+' '+aliasField)
                 }
 
                 newsFields.push(aliasField)

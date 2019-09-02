@@ -76,20 +76,6 @@ class Table {
     }
 
     /**
-     * Retorna o nome de um campo com base no seu alias
-     *
-     * @param   {String}  aliasField    No formato AliasField
-     * @return  {String}  fieldName     Nome do campo, que esteja no atributo this.schema
-     */
-    getFieldName (aliasField='') {
-      let fieldName   = aliasField
-      const arrFields = aliasField.replace(/([A-Z])/g, ' $1').trim().replace(' ','.').replace(' ','_').toLowerCase().split('.')
-      fieldName       = arrFields[1] || ''
-
-      return fieldName
-    }
-
-    /**
      * Retorna do cache, o schema de uma table.
      *
      * @param   {String}    table   Nome da tabela.

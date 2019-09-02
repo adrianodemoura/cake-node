@@ -25,7 +25,14 @@ module.exports = async function(params) {
         if (!Usuarios) {
             throw new Error(__('Não foi possível inicializar %Usuarios%')+'. '+__('Certifique-se que a instalação inicial foi executada.'))
         }
-        const dataUsuario   = await Usuarios.find({recursive: 0, fieldHidden: true, type: 'first', fields: ['id','nome','email','ativo','ultimo_acesso','acessos'], where: {'token':token}})
+        const dataUsuario   = await Usuarios.find({
+            fieldHidden: true, 
+            type: 'first', 
+            fields: ['usua.id', 'usua.nome', 'usua.email', 'usua.ativo', 'usua.ultimo_acesso', 'usua.acessos', 'muni.id', 'muni.nome'],
+            associations: ['Perfis', 'Unidades', 'Municipio'], 
+            where: {'token':token}
+        })
+        gravaLog(dataUsuario, 'dataUsuario')
         if (!dataUsuario) {
             throw new Error(__('O Token informado não pertence a nenhum usuário!'))
         }
