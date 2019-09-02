@@ -1,5 +1,7 @@
 tmp/**/*
 !tmp/empty
+!tmp/cache/empty
+!tmp/logs/empty
 
 node_modules/*
 
