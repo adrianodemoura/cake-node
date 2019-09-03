@@ -18,6 +18,9 @@ class Perfis extends Table {
         this.schemaName = 'perfil'
 
         this.associations = {
+            Aplicacao: {
+                hasOne: { table: 'mac.aplicacoes', foreignKeyLeft: 'aplicacao_id'}
+            },
             Usuarios: {
                 hasMany: {
                     table:                      'mac.usuarios', 

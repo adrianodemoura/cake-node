@@ -33,7 +33,6 @@ class Unidade extends Schema {
             default: '',
             comment: 'nome do perfil'
         }
-
         this.schema.cpf_cnpj = {
             title: __('Cpf/Cnpj'),
             type: 'string',
@@ -42,6 +41,13 @@ class Unidade extends Schema {
             index: true,
             default: '0',
             comment: 'cpf ou cnpj'
+        }
+        this.schema.aplicacao_id = {
+            title: __('Id da Aplicação'),
+            type: 'number',
+            not_null: true,
+            default: 0,
+            comment: 'aplicação do unidade'
         }
     }
 

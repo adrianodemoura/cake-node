@@ -35,6 +35,13 @@ class Perfil extends Schema {
             default: '',
             comment: 'nome do perfil'
         }
+        this.schema.aplicacao_id = {
+            title: __('Id da Aplicação'),
+            type: 'number',
+            not_null: true,
+            default: 1,
+            comment: 'aplicação do perfil'
+        }
     }
 
 }

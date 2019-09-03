@@ -20,25 +20,28 @@ class Usuarios extends Table {
         // associações
         this.associations = {
             Municipio: {
-                hasOne: {
-                    table:                  'mac.municipios', 
-                    foreignKeyLeft:         'municipio_id',
+                hasOne: { table: 'mac.municipios', foreignKeyLeft: 'municipio_id'}
+            },
+            Papeis: {
+                hasMany: {
+                    table: 'mac.papeis', 
+                    foreignKeyRight: 'usuario_id'
                 }
             },
             Perfis: {
                 hasMany: { 
-                    table:                  'mac.perfis',  
-                    tableBridge:            'associacoes', 
-                    foreignKeyBridgeLeft:   'usuario_id', 
-                    foreignKeyBridgeRight:  'perfil_id'
+                    table: 'mac.perfis', 
+                    tableBridge: 'papeis', 
+                    foreignKeyBridgeLeft: 'usuario_id', 
+                    foreignKeyBridgeRight: 'perfil_id' 
                 }
             },
             Unidades: {
                 hasMany: { 
-                    table:                  'mac.unidades', 
-                    tableBridge:            'associacoes', 
-                    foreignKeyBridgeLeft:   'usuario_id', 
-                    foreignKeyBridgeRight:  'unidade_id'
+                    table: 'mac.unidades', 
+                    tableBridge: 'papeis', 
+                    foreignKeyBridgeLeft: 'usuario_id', 
+                    foreignKeyBridgeRight: 'unidade_id'
                 }
             }
         }
@@ -107,6 +110,19 @@ class Usuarios extends Table {
         }
 
         return true
+    }
+
+    /**
+     * Retorna as rotas do usuários
+     *
+     * @param   {Integer}   idUsuario   Id do usuário.
+     * @param   {Integer}   idPerfil    Código do papel, no formato IdUsuario,IdPerfil,IdUnidade.
+     * @return  {Object}    rotas       Lista de rotas do usuário pelo seu papel
+     */
+    async getMinhasRotas(idUsuario=0, codigoPapel=0) {
+        let rotas = {}
+
+        return rotas
     }
 
 }

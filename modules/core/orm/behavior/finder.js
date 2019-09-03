@@ -290,7 +290,7 @@ class Finder extends Behavior {
                 sql += ' WHERE aliasBridge.foreignKeyBridgeLeft = valueKey'
                 params.aliasBridge  = params.aliasBridge || params.tableBridge.substr(0, 4).capitalize()
             } else {
-                sql += ' WHERE aliasRight.municipio_id = valueKey'
+                sql += ' WHERE aliasRight.foreignKeyRight = valueKey'
             }
 
             params.aliasRight = params.aliasRight  || params.tableRight.substr(0, 4).capitalize()
