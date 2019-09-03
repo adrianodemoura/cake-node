@@ -36,7 +36,7 @@ class Table {
         this.primaryKey             = ''
         this.displayField           = ''
         this.name                   = this.constructor.name
-        this.alias                  = this.name.substr(0,4)
+        this.alias                  = this.name.fourAlias()
         this.schema                 = {}
         this.associations           = {}
         this.validations            = {}

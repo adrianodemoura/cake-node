@@ -51,11 +51,10 @@ class Crud extends Behavior {
             sql = 'INSERT INTO '+this.table+' (fields) VALUES (values)'        
         }
 
-        for(let aliasField in this.data) {
-            let undoAliasField  = aliasField.undoAlias().toLowerCase()
-            let arrUndoAlias    = undoAliasField.split('.')
-            let field           = arrUndoAlias[1] || ''
-            if (! this.schema[field]) {
+        for (let field in this.schema) {
+            let aliasField      = this.name.fourAlias()+field.humanize()
+
+            if (!!! this.data[aliasField] ) {
                 continue
             }
 

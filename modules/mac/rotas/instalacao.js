@@ -134,10 +134,10 @@ module.exports = app => {
                 throw new Error('20 - '+Unidades.error)
             }
             let dataUnidades = {
-                0: {UnidId: 10, UnidCpfCnpj: 10, UnidNome: 'UNIDADE GERAL', PerfAplicacaoId: 1},
-                1: {UnidId: 20, UnidCpfCnpj: 20, UnidNome: 'UNIDADE DA DIREITA', PerfAplicacaoId: 1},
-                2: {UnidId: 30, UnidCpfCnpj: 30, UnidNome: 'UNIDADE DA ESQUERDA', PerfAplicacaoId: 1},
-                3: {UnidId: 40, UnidCpfCnpj: 40, UnidNome: 'UNIDADE CENTRAL', PerfAplicacaoId: 1}
+                0: {UnidId: 10, UnidCpfCnpj: 10, UnidNome: 'UNIDADE GERAL', UnidAplicacaoId: 1},
+                1: {UnidId: 20, UnidCpfCnpj: 20, UnidNome: 'UNIDADE DA DIREITA', UnidAplicacaoId: 1},
+                2: {UnidId: 30, UnidCpfCnpj: 30, UnidNome: 'UNIDADE DA ESQUERDA', UnidAplicacaoId: 1},
+                3: {UnidId: 40, UnidCpfCnpj: 40, UnidNome: 'UNIDADE CENTRAL', UnidAplicacaoId: 1}
             }
             Unidades.forceCreate = true
             if (! await Unidades.saveAll(dataUnidades)) {
@@ -257,57 +257,71 @@ module.exports = app => {
             }
             let dataRotas = {
                 0: {
-                    RotaCaminho: '/listar',
+                    RotaRota: '/listar',
                     RotaAplicacaoId: 1
                 },
                 1: {
-                    RotaCaminho: '/salvar',
+                    RotaRota: '/salvar',
                     RotaAplicacaoId: 1
                 },
                 2: {
-                    RotaCaminho: '/excluir',
+                    RotaRota: '/excluir',
                     RotaAplicacaoId: 1
                 },
                 3: {
-                    RotaCaminho: '/rotas',
+                    RotaRota: '/rotas',
                     RotaAplicacaoId: 1
                 },
                 4: {
-                    RotaCaminho: '/fake',
+                    RotaRota: '/fake',
                     RotaAplicacaoId: 1
                 },
                 5: {
-                    RotaCaminho: '/cadastros',
+                    RotaRota: '/cadastros',
                     RotaAplicacaoId: 1
                 },
                 6: {
-                    RotaCaminho: '/info',
+                    RotaRota: '/info',
                     RotaAplicacaoId: 1
                 },
                 7: {
-                    RotaCaminho: '/instalacao',
+                    RotaRota: '/instalacao',
                     RotaAplicacaoId: 1
                 },
                 8: {
-                    RotaCaminho: '/meu_token',
+                    RotaRota: '/meu_token',
                     RotaAplicacaoId: 1
                 },
                 9: {
-                    RotaCaminho: '/nova_senha',
+                    RotaRota: '/nova_senha',
                     RotaAplicacaoId: 1
                 },
                 10: {
-                    RotaCaminho: '/novo_token',
+                    RotaRota: '/novo_token',
                     RotaAplicacaoId: 1
                 },
                 11: {
-                    RotaCaminho: '/minhas_rotas',
+                    RotaRota: '/minhas_rotas',
                     RotaAplicacaoId: 1
                 }
             }
             Rotas.forceCreate = true
             if (! await Rotas.saveAll(dataRotas)) {
                 throw new Error('32 - '+Rotas.error)
+            }
+
+            // instalando as aplicações
+            const PerfisRotas = await getTable('mac.perfis_rotas')
+            if (! await PerfisRotas.createTable({delete:true})) {
+                throw new Error ('33 - '+Rotas.error)
+            }
+            let dataPerfisRotas = {
+                0: {PerfRotaRotaId: 1, PerfRotaPerfilId: 1},
+                1: {PerfRotaRotaId: 1, PerfRotaPerfilId: 2}
+            }
+            PerfisRotas.forceCreate = true
+            if (! await PerfisRotas.saveAll(dataPerfisRotas)) {
+                throw new Error('34 - '+PerfisRotas.error)
             }
 
             // criando o config geral
@@ -327,18 +341,18 @@ module.exports = app => {
             configText          += "module.exports = "+JSON.stringify(config, null, 2)
             fileSystem.writeFile('./config/config.js', configText, function(err) {
                 if (err) {
-                    throw new Error('33 - '+err)
+                    throw new Error('35 - '+err)
                 }
             })
 
             const fileSqlInstall = './modules/mac/config/schema/install_'+Auditorias.driver+'.sql'
             if (fileSystem.existsSync(fileSqlInstall)) {
                 if (! await Auditorias.db.query('DROP FUNCTION IF EXISTS MASK;')) {
-                    throw new Error('34 - '+__('Não foi possível excluir a função MASK!'))
+                    throw new Error('36 - '+__('Não foi possível excluir a função MASK!'))
                 }
                 let textoSql = fileSystem.readFileSync(fileSqlInstall, 'utf8').toString()
                 if (! await Auditorias.db.query(textoSql)) {
-                    throw new Error('35 - '+__('Não foi possível instalar o install de '+Auditorias.driver))
+                    throw new Error('37 - '+__('Não foi possível instalar o install de '+Auditorias.driver))
                 }
             }
 

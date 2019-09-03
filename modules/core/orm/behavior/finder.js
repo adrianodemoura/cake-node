@@ -28,7 +28,7 @@ class Finder extends Behavior {
                 console.log(testErrors[i])
             }
         }
-        
+
         return testErrors
     }
 
@@ -380,6 +380,7 @@ class Finder extends Behavior {
                     propHasMany.foreignKeyLeft  = propHasMany.foreignKeyLeft    || assocHasMany.primaryKey
                     propHasMany.foreignKeyRight = propHasMany.foreignKeyRight   || assocHasMany.primaryKey
                     propHasMany.tableRight      = propHasMany.tableRight        || assocHasMany.table
+                    propHasMany.aliasRight      = propHasMany.aliasRight
                     propHasMany.schema          = assocHasMany.schema
 
                     if (!!!propHasMany.fields) {

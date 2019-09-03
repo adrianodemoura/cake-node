@@ -29,6 +29,13 @@ class Perfis extends Table {
                     foreignKeyBridgeRight:      'usuario_id',
                     fields:                     ['id', 'nome', 'ativo']
                 }
+            },
+            Rotas: {
+                hasMany: { 
+                    table: 'mac.rotas', 
+                    foreignKeyBridgeLeft: 'perfil_id', 
+                    foreignKeyBridgeRight: 'rota_id'
+                }
             }
         }
 

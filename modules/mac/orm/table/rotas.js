@@ -25,11 +25,12 @@ class Rotas extends Table {
                 }
             },
             Perfis: {
-                hasMany: { 
+                hasMany: {
                     table:                  'mac.perfis',  
                     tableBridge:            'perfis_rotas', 
                     foreignKeyBridgeLeft:   'rota_id', 
                     foreignKeyBridgeRight:  'perfil_id'
+                    /*aliasRight:             'PerfRota'*/
                 }
             },
         }
