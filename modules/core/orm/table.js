@@ -36,7 +36,6 @@ class Table {
         this.primaryKey             = ''
         this.displayField           = ''
         this.name                   = this.constructor.name
-        this.alias                  = this.name.fourAlias()
         this.schema                 = {}
         this.associations           = {}
         this.validations            = {}
@@ -163,6 +162,7 @@ class Table {
     async setSchema() {
 
         await this.init()
+        this.alias              = this.table.humanize().fourAlias()
 
         const Cache             = require (CORE + '/lib/cache.js')
         const schemaCacheName   = 'schema_'+this.table

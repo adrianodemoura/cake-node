@@ -278,9 +278,14 @@ class Finder extends Behavior {
             if (!!!params.tableRight) {
                 throw new Error(__('Tabela do lado direito inválida!'))
             }
-
             if (!!!params.fields) {
                 throw new Error(__('Campos do lado direito inválidos!'))
+            }
+            if (!!!params.aliasBridge) {
+                throw new Error(__('alias da ponte inválido!'))
+            }
+            if (!!!params.tableBridge) {
+                throw new Error(__('tabela da ponte inválida!'))
             }
 
             sql = 'SELECT fieldsRight FROM tableRight aliasRight'
@@ -288,12 +293,9 @@ class Finder extends Behavior {
             if (params.tableBridge) {
                 sql += ' LEFT JOIN tableBridge aliasBridge ON aliasBridge.foreignKeyBridgeRight = aliasRight.foreignKeyRight'
                 sql += ' WHERE aliasBridge.foreignKeyBridgeLeft = valueKey'
-                params.aliasBridge  = params.aliasBridge || params.tableBridge.substr(0, 4).capitalize()
             } else {
                 sql += ' WHERE aliasRight.foreignKeyRight = valueKey'
             }
-
-            params.aliasRight = params.aliasRight  || params.tableRight.substr(0, 4).capitalize()
 
             if (params.fields.constructor.name !== 'String') {
                 let newFieldsRight = ''
@@ -320,7 +322,9 @@ class Finder extends Behavior {
                 .replace('foreignKeyBridgeLeft', params.foreignKeyBridgeLeft)
             sql = sql.replaceAll('aliasBridge', params.aliasBridge)
         } catch (error) {
-            sql = error.message
+            this.error = error.message
+            console.log(this.error)
+            sql = ''
         }
 
         return sql
@@ -380,7 +384,8 @@ class Finder extends Behavior {
                     propHasMany.foreignKeyLeft  = propHasMany.foreignKeyLeft    || assocHasMany.primaryKey
                     propHasMany.foreignKeyRight = propHasMany.foreignKeyRight   || assocHasMany.primaryKey
                     propHasMany.tableRight      = propHasMany.tableRight        || assocHasMany.table
-                    propHasMany.aliasRight      = propHasMany.aliasRight
+                    propHasMany.aliasRight      = propHasMany.aliasRight        || assocHasMany.alias
+                    propHasMany.aliasBridge     = propHasMany.aliasBridge       || propHasMany.tableBridge.humanize().fourAlias()
                     propHasMany.schema          = assocHasMany.schema
 
                     if (!!!propHasMany.fields) {
@@ -403,6 +408,7 @@ class Finder extends Behavior {
 
                     }
                     propHasMany.fields = newFields
+                    if (this.table === 'rotas') gravaLog(propHasMany, 'propHasMany')
 
                     sqlJoin.hasMany[assoc] = this.getSqlHasMany(propHasMany)
                 }

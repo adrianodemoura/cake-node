@@ -30,7 +30,6 @@ class Rotas extends Table {
                     tableBridge:            'perfis_rotas', 
                     foreignKeyBridgeLeft:   'rota_id', 
                     foreignKeyBridgeRight:  'perfil_id'
-                    /*aliasRight:             'PerfRota'*/
                 }
             },
         }
