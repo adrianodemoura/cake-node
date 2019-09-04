@@ -43,7 +43,7 @@ module.exports = app => {
             const adminEmail    = (!!app.settings.params.email) ? app.settings.params.email : ''
             const adminSenha    = (!!app.settings.params.senha) ? app.settings.params.senha : ''
             const dropAll       = (!!app.settings.params.drop)  ? app.settings.params.drop  : false
-            let csvMunicipio  = (!!app.settings.params.csv)   ? app.settings.params.csv   : 'min'
+            let csvMunicipio    = (!!app.settings.params.csv)   ? app.settings.params.csv   : 'min'
             if (['full', 'min'].indexOf(csvMunicipio) === -1)
             {
                 throw new Error('01 - '+__("O Parâmetro CSV deve ser 'full' ou 'min'!"))
@@ -162,9 +162,9 @@ module.exports = app => {
                     let arrLinha = linhasMunicipios[i].split(';')
 
                     dataMunicipios[csvLoop] = {}
-                    dataMunicipios[csvLoop]['MuniId']           = arrLinha[0]
-                    dataMunicipios[csvLoop]['MuniNome']         = arrLinha[1].trim()
-                    dataMunicipios[csvLoop]['MuniUf']           = arrLinha[2].trim()
+                    dataMunicipios[csvLoop]['MuniId']          = arrLinha[0]
+                    dataMunicipios[csvLoop]['MuniNome']        = arrLinha[1].trim()
+                    dataMunicipios[csvLoop]['MuniUf']          = arrLinha[2].trim()
                     dataMunicipios[csvLoop]['MuniCodiEstd']    = arrLinha[3]
                     dataMunicipios[csvLoop]['MuniDescEstd']    = arrLinha[4].trim()
                 }
@@ -317,7 +317,16 @@ module.exports = app => {
             }
             let dataPerfisRotas = {
                 0: {PerfRotaRotaId: 1, PerfRotaPerfilId: 1},
-                1: {PerfRotaRotaId: 1, PerfRotaPerfilId: 2}
+                1: {PerfRotaRotaId: 2, PerfRotaPerfilId: 1},
+                2: {PerfRotaRotaId: 3, PerfRotaPerfilId: 1},
+                3: {PerfRotaRotaId: 4, PerfRotaPerfilId: 1},
+                4: {PerfRotaRotaId: 5, PerfRotaPerfilId: 1},
+                5: {PerfRotaRotaId: 6, PerfRotaPerfilId: 1},
+                6: {PerfRotaRotaId: 7, PerfRotaPerfilId: 1},
+                7: {PerfRotaRotaId: 8, PerfRotaPerfilId: 1},
+                8: {PerfRotaRotaId: 9, PerfRotaPerfilId: 1},
+                9: {PerfRotaRotaId: 10, PerfRotaPerfilId: 1},
+                10: {PerfRotaRotaId: 11, PerfRotaPerfilId: 1}
             }
             PerfisRotas.forceCreate = true
             if (! await PerfisRotas.saveAll(dataPerfisRotas)) {

@@ -281,12 +281,6 @@ class Finder extends Behavior {
             if (!!!params.fields) {
                 throw new Error(__('Campos do lado direito inválidos!'))
             }
-            if (!!!params.aliasBridge) {
-                throw new Error(__('alias da ponte inválido!'))
-            }
-            if (!!!params.tableBridge) {
-                throw new Error(__('tabela da ponte inválida!'))
-            }
 
             sql = 'SELECT fieldsRight FROM tableRight aliasRight'
 
@@ -385,8 +379,10 @@ class Finder extends Behavior {
                     propHasMany.foreignKeyRight = propHasMany.foreignKeyRight   || assocHasMany.primaryKey
                     propHasMany.tableRight      = propHasMany.tableRight        || assocHasMany.table
                     propHasMany.aliasRight      = propHasMany.aliasRight        || assocHasMany.alias
-                    propHasMany.aliasBridge     = propHasMany.aliasBridge       || propHasMany.tableBridge.humanize().fourAlias()
                     propHasMany.schema          = assocHasMany.schema
+                    if (propHasMany.tableBridge && !!!propHasMany.aliasBridge) {
+                        propHasMany.aliasBridge = propHasMany.tableBridge.humanize().fourAlias()
+                    }
 
                     if (!!!propHasMany.fields) {
                         propHasMany.fields = []
@@ -408,7 +404,6 @@ class Finder extends Behavior {
 
                     }
                     propHasMany.fields = newFields
-                    if (this.table === 'rotas') gravaLog(propHasMany, 'propHasMany')
 
                     sqlJoin.hasMany[assoc] = this.getSqlHasMany(propHasMany)
                 }
@@ -749,7 +744,6 @@ class Finder extends Behavior {
             if (!noCount) {
                 lista.paging = paginacao
             }
-
             // recuperando as associações do tipo hasMany
             for (let assocHasMany in sqlJoin.hasMany) {
                 for (let loopItens in lista.itens) {

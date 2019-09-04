@@ -27,22 +27,6 @@ class Usuarios extends Table {
                     table: 'mac.papeis', 
                     foreignKeyRight: 'usuario_id'
                 }
-            },
-            Perfis: {
-                hasMany: { 
-                    table: 'mac.perfis', 
-                    tableBridge: 'papeis', 
-                    foreignKeyBridgeLeft: 'usuario_id', 
-                    foreignKeyBridgeRight: 'perfil_id' 
-                }
-            },
-            Unidades: {
-                hasMany: { 
-                    table: 'mac.unidades', 
-                    tableBridge: 'papeis', 
-                    foreignKeyBridgeLeft: 'usuario_id', 
-                    foreignKeyBridgeRight: 'unidade_id'
-                }
             }
         }
 
