@@ -25,7 +25,9 @@ class Usuarios extends Table {
             Papeis: {
                 hasMany: {
                     table: 'mac.papeis', 
-                    foreignKeyRight: 'usuario_id'
+                    foreignKeyRight: 'usuario_id',
+                    fields: ['perfil_id', 'unidade_id', 'Perf.nome', 'Unid.nome'],
+                    includeHasOne: ['Perfil', 'Unidade']
                 }
             }
         }

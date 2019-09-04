@@ -286,8 +286,18 @@ class Finder extends Behavior {
 
             if (params.tableBridge) {
                 sql += ' LEFT JOIN tableBridge aliasBridge ON aliasBridge.foreignKeyBridgeRight = aliasRight.foreignKeyRight'
+                if (params.includeJoin) {
+                    for (let i in params.includeJoin) {
+                        sql += ' '+params.includeJoin[i]
+                    }
+                }
                 sql += ' WHERE aliasBridge.foreignKeyBridgeLeft = valueKey'
             } else {
+                if (params.includeJoin) {
+                    for (let i in params.includeJoin) {
+                        sql += ' '+params.includeJoin[i]
+                    }
+                }
                 sql += ' WHERE aliasRight.foreignKeyRight = valueKey'
             }
 
@@ -374,6 +384,7 @@ class Finder extends Behavior {
                     const assocHasMany          = await getTable(this.associations[assoc].hasMany.table)
                     const propHasMany           = objectClone(this.associations[assoc].hasMany)
                     const newFields             = []
+                    const includeJoin           = {sql:[], schema:{}}
 
                     propHasMany.foreignKeyLeft  = propHasMany.foreignKeyLeft    || assocHasMany.primaryKey
                     propHasMany.foreignKeyRight = propHasMany.foreignKeyRight   || assocHasMany.primaryKey
@@ -384,17 +395,38 @@ class Finder extends Behavior {
                         propHasMany.aliasBridge = propHasMany.tableBridge.humanize().fourAlias()
                     }
 
+                    if (propHasMany.includeHasOne) {
+                        for (let i in propHasMany.includeHasOne) {
+                            const assocBridgeName   = propHasMany.includeHasOne[i]
+                            const tableBridgeName   = assocHasMany.associations[assocBridgeName].hasOne.table
+                            const fieldBridgeName   = assocHasMany.associations[assocBridgeName].hasOne.foreignKeyLeft
+                            const assocHasOne       = await getTable(tableBridgeName)
+                            let sqlHasOne           = 'LEFT JOIN '+assocHasOne.table+' '+assocHasOne.alias
+                            sqlHasOne += ' ON '+assocHasOne.alias+'.'+assocHasOne.primaryKey+' = '+assocHasMany.alias+'.'+fieldBridgeName
+                            includeJoin.sql.push(sqlHasOne)
+                            includeJoin.schema[assocBridgeName.fourAlias()] = assocHasOne.schema
+                        }
+                        if (includeJoin.sql.length>0) {
+                            propHasMany.includeJoin = includeJoin.sql
+                        }
+                    }
+
                     if (!!!propHasMany.fields) {
                         propHasMany.fields = []
                         for (let field in assocHasMany.schema) {
                             propHasMany.fields.push(field)
                         }
                     }
-                    for (let l in propHasMany.fields) {
-                        let field   = propHasMany.fields[l]
-                        let type    = assocHasMany.schema[field].type       || 'string'
-                        let hidden  = assocHasMany.schema[field].hidden     || false
-                        hidden      = !!!assocHasMany.schema[field].pk  ? hidden : false
+                    for (let l in propHasMany.fields) { // verifica se os campos podem ser exibidos
+                        const field     = propHasMany.fields[l]
+                        let schema      = assocHasMany.schema[field]    || false
+                        if (!schema && typeof includeJoin.schema !== 'undefined') {
+                            const arrField = field.split('.')
+                            schema = includeJoin.schema[arrField[0]][arrField[1]] || false
+                        }
+
+                        let hidden      = schema.hidden || false
+                        hidden          = !!!schema.pk  ? hidden : false
 
                         if (hidden) {
                             continue
