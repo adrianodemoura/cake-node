@@ -28,13 +28,9 @@ module.exports = async function(params) {
         const dataUsuario   = await Usuarios.find({
             fieldHidden: true, 
             type: 'first', 
-            fields: ['usua.id', 'usua.nome', 'usua.email', 'usua.ativo', 'usua.ultimo_acesso', 'usua.acessos', 'muni.id', 'muni.nome'],
-            associations: ['Perfis', 'Unidades', 'Municipio'], 
+            fields: ['usua.id', 'usua.nome', 'usua.email', 'usua.ativo', 'usua.ultimo_acesso', 'usua.acessos'],
             where: {'token':token}
         })
-        if (!dataUsuario) {
-            throw new Error(Usuarios.error)
-        }
         if (!!!dataUsuario) {
             throw new Error(__('%Token% inválido!'))
         }

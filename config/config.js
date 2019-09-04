@@ -2,7 +2,7 @@
  * Configurações gerais da API
  *
  * @author  Administrador cakeNode
- * @date    04/09/2019 10:42:51
+ * @date    04/09/2019 10:49:51
  */
 'use strict'
 /**
@@ -12,5 +12,5 @@ module.exports = {
   "language": "en",
   "versao": "0.6",
   "sistema": "cakeNode",
-  "salt": "fe757e79ccc55dc06be8f67eee3f368d98276a0da958ddb870ee30983259ba494b6ca6d8b623715cfd4567e97dcd09aa2c1610ecf4690ff9668efac8f7a7f744"
+  "salt": "e83abd40f3a4cab1abffaee187b2a7165196893ea9b63cf672208ab23506aa9d719ec1c1ac26aedad43745723b7ee75ed908c11a0051fbca8b9c57637f570b64"
 }
