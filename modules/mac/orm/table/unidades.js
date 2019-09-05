@@ -19,11 +19,29 @@ class Unidades extends Table {
         this.schemaName = 'unidade'
 
         this.associations = {
-            Aplicacao: {
-                hasOne: { table: 'mac.aplicacoes', foreignKeyLeft: 'aplicacao_id'}
+            Aplicacoes: {
+                hasMany: {
+                    table: 'mac.aplicacoes', 
+                    tableBridge: 'vinculacoes',
+                    foreignKeyBridgeLeft: 'unidade_id', 
+                    foreignKeyBridgeRight: 'aplicacao_id'
+                }
+            },
+            Perfis: {
+                hasMany: { 
+                    table: 'mac.perfis', 
+                    tableBridge: 'vinculacoes',
+                    foreignKeyBridgeLeft: 'unidade_id', 
+                    foreignKeyBridgeRight: 'perfil_id'
+                }
             },
             Usuarios: {
-                hasMany: { table: 'mac.usuarios', foreignKeyLeft: 'id', tableBridge: 'associacoes', foreignKeyBridgeLeft: 'unidade_id', foreignKeyBridgeRight: 'usuario_id', tableRight: 'usuarios', foreignKeyRight: 'id', fields: ['id', 'nome', 'email', 'cpf']}
+                hasMany: { 
+                    table: 'mac.usuarios', 
+                    tableBridge: 'vinculacoes',
+                    foreignKeyBridgeLeft: 'unidade_id', 
+                    foreignKeyBridgeRight: 'usuario_id'
+                }
             }
         }
 

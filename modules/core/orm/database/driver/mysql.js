@@ -501,6 +501,74 @@ class db {
 
 	    return allFields
 	}
+
+    /**
+     * Cria uma nova coluna na tablea
+     *
+     * @params    {Object}    params  Parâmetros da colunas
+     * @return  {Boolean}   boolean     Verdadeiro em caso de sucesso, falso se não.
+     */
+    async addColumn (params={}) {
+        if (!!!params.table || !!!params.field || !!!params.type) {
+            console.log(params)
+            return false
+        }
+
+        let sql = "ALTER TABLE "+params.table+" ADD "+params.field+" "+params.type
+        if (params.default) {
+            sql += " DEFAULT "+params.default
+        }
+        if (params.not_null) {
+            sql += " NOT NULL"
+        }
+        if (params.comment) {
+            sql += " COMMENT '"+params.comment+"'"
+        }
+
+        if (! await this.query(sql)) {
+            console.log(sql)
+            return false
+        }
+
+        return true
+    }
+
+    /**
+     * Cria uma nova coluna na tablea
+     *
+     * @params    {Object}    params  Parâmetros da colunas
+     * @return  {Boolean}   boolean     Verdadeiro em caso de sucesso, falso se não.
+     */
+    async addConstraint (params={}) {
+        if (!!!params.table || !!!params.tableRight || !!!params.fieldRight || !!!params.tableRightPk) {
+            console.log(params)
+            return false
+        }
+        if (!!!params.name) {
+            params.name = params.table+'_'+params.tableRight+'_'+params.fieldRight+'_fk'
+        }
+
+        //ALTER TABLE cakenode_bd.vinculacoes ADD CONSTRAINT vinculacoes_fk 
+        //FOREIGN KEY (usuario_id) REFERENCES cakenode_bd.usuarios(id) 
+        //ON DELETE CASCADE ON UPDATE CASCADE;
+
+        let sql = "ALTER TABLE "+params.table+" ADD CONSTRAINT "+params.name
+        sql += " FOREIGN KEY ("+params.fieldRight+")"
+        sql += " REFERENCES "+params.tableRight+"("+params.tableRightPk+")"
+        if (!!!params.onDelete) {
+            sql += " ON DELETE CASCADE"
+        }
+        if (!!!params.onDelete) {
+            sql += " ON UPDATE CASCADE"
+        }
+
+        if (! await this.query(sql)) {
+            console.log(sql)
+            return false
+        }
+
+        return true
+    }
 }
 
 module.exports = (config) => new db(config)

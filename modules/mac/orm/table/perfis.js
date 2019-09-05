@@ -22,17 +22,17 @@ class Perfis extends Table {
                 hasOne: { table: 'mac.aplicacoes', foreignKeyLeft: 'aplicacao_id'}
             },
             Usuarios: {
-                hasMany: {
-                    table:                      'mac.usuarios', 
-                    tableBridge:                'associacoes', 
-                    foreignKeyBridgeLeft:       'perfil_id', 
-                    foreignKeyBridgeRight:      'usuario_id',
-                    fields:                     ['id', 'nome', 'ativo']
+                hasMany: { 
+                    table: 'mac.usuarios', 
+                    tableBridge: 'vinculacoes',
+                    foreignKeyBridgeLeft: 'perfil_id', 
+                    foreignKeyBridgeRight: 'usuario_id'
                 }
             },
             Rotas: {
                 hasMany: { 
                     table: 'mac.rotas', 
+                    tableBridge: 'perfis_rotas',
                     foreignKeyBridgeLeft: 'perfil_id', 
                     foreignKeyBridgeRight: 'rota_id'
                 }

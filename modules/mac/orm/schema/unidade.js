@@ -42,13 +42,6 @@ class Unidade extends Schema {
             default: '0',
             comment: 'cpf ou cnpj'
         }
-        this.schema.aplicacao_id = {
-            title: __('Id da Aplicação'),
-            type: 'number',
-            not_null: true,
-            default: 0,
-            comment: 'aplicação do unidade'
-        }
     }
 
 }

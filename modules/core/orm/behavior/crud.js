@@ -442,6 +442,9 @@ class Crud extends Behavior {
             for (let table in tableClean) {
                 let sqlDel = 'DELETE FROM '+table+' WHERE '+tableClean[table]
                 if (! await this.query(sqlDel)) {
+                    if (this.debug) {
+                        console.log(sqlDel)
+                    }
                     throw new Error(__('Erro ao tentar limpar relacionamentos de '+table))
                 }
             }
@@ -742,6 +745,8 @@ class Crud extends Behavior {
             params.fields       = objectClone(this.schema)
             params.associations = objectClone(this.associations)
 
+            const listTables    = await this.db.listTables()
+
             if (params.delete) {
                 if (! await this.db.dropTable(this.table) ) {
                     throw new Error('Não foi possível excluir a tabela %'+params.table+'%')
@@ -831,10 +836,41 @@ class Crud extends Behavior {
 
             if (Object.keys(paramsHasmany.fields).length) {
                 let sqlCreateHasMany = this.db.getSqlCreate(paramsHasmany)
-                if (! this.query(sqlCreateHasMany) ) {
-                    console.log(this.error)
-                    throw new Error(__('Não foi possível criar Associações de '+this.table))
+
+                if (listTables.indexOf(paramsHasmany.table) > -1) {
+                    const allFieldsHM   = await this.db.getAllFields(paramsHasmany.table)
+                    let newFields       = []
+                    for (let fieldHM in paramsHasmany.fields) {
+                        if (!!! allFieldsHM[fieldHM]) {
+                            newFields[fieldHM] = paramsHasmany.fields[fieldHM]
+                        }
+                    }
+                    for (let field in newFields) {
+                        let paramsNewColumn     = newFields[field]
+                        let paramsNewConstrant  = {}
+                        
+                        paramsNewColumn.field   = field
+                        paramsNewColumn.table   = paramsHasmany.table
+                        
+                        paramsNewConstrant.table        = paramsHasmany.table
+                        paramsNewConstrant.fieldRight   = field
+                        paramsNewConstrant.tableRight   = this.table
+                        paramsNewConstrant.tableRightPk = this.primaryKey
+
+                        if (! await this.db.addColumn(paramsNewColumn)) {
+                            throw new Error (__('Não foi possível incluir novos campos na tabela %'+paramsNewColumn.table+'%'))
+                        }
+                        if (! await this.db.addConstraint(paramsNewConstrant)) {
+                            throw new Error (__('Não foi possível incluir uma nova constrant para a tabela %'+paramsNewConstrant+'%'))
+                        }
+                    }
+                } else {
+                    if (! this.query(sqlCreateHasMany) ) {
+                        console.log(this.error)
+                        throw new Error(__('Não foi possível criar Associações de '+this.table))
+                    }
                 }
+
             }
 
             return true

@@ -63,59 +63,56 @@ module.exports = app => {
 
             // excluindo tudo antes
             if (dropAll && configEnv.debug) {
+                if (! await conexao.query("DROP TABLE IF EXISTS vinculacoes") ) {
+                    throw new Error('05 - '+__('Erro ao tentar excluir a tablela %vinculacoes%!'))
+                }
                 if (! await conexao.query("DROP TABLE IF EXISTS perfis_rotas") ) {
-                    throw new Error('05 - '+__('Erro ao tentar excluira a tablela %perfis_rotas%!'))
+                    throw new Error('06 - '+__('Erro ao tentar excluira a tablela %perfis_rotas%!'))
                 }
                 if (! await conexao.query("DROP TABLE IF EXISTS rotas") ) {
-                    throw new Error('06 - '+__('Erro ao tentar excluira a tablela %rotas%!'))
-                }
-                if (! await conexao.query("DROP TABLE IF EXISTS associacoes") ) {
-                    throw new Error('07 - '+__('Erro ao tentar excluira a tablea %associacoes%!'))
-                }
-                if (! await conexao.query("DROP TABLE IF EXISTS papeis") ) {
-                    throw new Error('08 - '+__('Erro ao tentar excluira a tablea %papeis%!'))
+                    throw new Error('07 - '+__('Erro ao tentar excluira a tablela %rotas%!'))
                 }
                 if (! await conexao.query("DROP TABLE IF EXISTS auditorias") ) {
-                    throw new Error('09 - '+__('Erro ao tentar excluira a tablea %auditorias%!'))
+                    throw new Error('08 - '+__('Erro ao tentar excluira a tablea %auditorias%!'))
                 }
                 if (! await conexao.query("DROP TABLE IF EXISTS perfis") ) {
-                    throw new Error('10 - '+__('Erro ao tentar excluira a tablea %perfis%!'))
+                    throw new Error('09 - '+__('Erro ao tentar excluira a tablea %perfis%!'))
                 }
                 if (! await conexao.query("DROP TABLE IF EXISTS unidades") ) {
-                    throw new Error('11 - '+__('Erro ao tentar excluira a tablea %unidades%!'))
+                    throw new Error('10 - '+__('Erro ao tentar excluira a tablea %unidades%!'))
                 }
                 if (! await conexao.query("DROP TABLE IF EXISTS aplicacoes") ) {
-                    throw new Error('12 - '+__('Erro ao tentar excluira a tablela %aplicacoes%!'))
+                    throw new Error('11 - '+__('Erro ao tentar excluira a tablela %aplicacoes%!'))
                 }
                 if (! await conexao.query("DROP TABLE IF EXISTS usuarios") ) {
-                    throw new Error('13 - '+__('Erro ao tentar excluira a tablea %usuarios%!'))
+                    throw new Error('12 - '+__('Erro ao tentar excluira a tablea %usuarios%!'))
                 }
                 if (! await conexao.query("DROP TABLE IF EXISTS municipios") ) {
-                    throw new Error('14 - '+__('Erro ao tentar excluira a tablea %municipios%!'))
+                    throw new Error('13 - '+__('Erro ao tentar excluira a tablea %municipios%!'))
                 }
             }
 
             // verificando se existem mais usuários
             const listTables = await conexao.listTables()
             if (listTables.length > 1) {
-                throw new Error('15 - '+__('A instalação inicial já foi inicializada!'))
+                throw new Error('14 - '+__('A instalação inicial já foi inicializada!'))
             }
 
             // instalando as aplicações
             const Aplicacoes = await getTable('mac.aplicacoes')
             if (! await Aplicacoes.createTable({delete:true})) {
-                throw new Error ('16 - ' + Aplicacoes.error)
+                throw new Error ('15 - ' + Aplicacoes.error)
             }
             let dataAplicacoes = {'ApliId': 1, 'ApliNome': configure('sistema')}
             Aplicacoes.forceCreate = true
             if (! await Aplicacoes.save(dataAplicacoes)) {
-                throw new Error('17 - ' + Aplicacoes.error)
+                throw new Error('16 - ' + Aplicacoes.error)
             }
 
             // instalando os perfis
             const Perfis = await getTable('mac.perfis')
             if (! await Perfis.createTable({delete: true})) {
-                throw new Error('18 - '+Perfis.error)
+                throw new Error('17 - '+Perfis.error)
             }
             let dataPerfis = {
                 0: {PerfId: 1, PerfNome: 'ADMINISTRADOR', PerfAplicacaoId: 1},
@@ -125,30 +122,30 @@ module.exports = app => {
             }
             Perfis.forceCreate = true
             if (! await Perfis.saveAll(dataPerfis)) {
-                throw new Error('19 - '+Perfis.error)
+                throw new Error('18 - '+Perfis.error)
             }
 
             // instalando as unidades
             const Unidades = await getTable('mac.unidades')
             if (! await Unidades.createTable({delete: true})) {
-                throw new Error('20 - '+Unidades.error)
+                throw new Error('19 - '+Unidades.error)
             }
             let dataUnidades = {
-                0: {UnidId: 10, UnidCpfCnpj: 10, UnidNome: 'UNIDADE GERAL', UnidAplicacaoId: 1},
-                1: {UnidId: 20, UnidCpfCnpj: 20, UnidNome: 'UNIDADE DA DIREITA', UnidAplicacaoId: 1},
-                2: {UnidId: 30, UnidCpfCnpj: 30, UnidNome: 'UNIDADE DA ESQUERDA', UnidAplicacaoId: 1},
-                3: {UnidId: 40, UnidCpfCnpj: 40, UnidNome: 'UNIDADE CENTRAL', UnidAplicacaoId: 1}
+                0: {UnidId: 10, UnidCpfCnpj: 10, UnidNome: 'UNIDADE GERAL'},
+                1: {UnidId: 20, UnidCpfCnpj: 20, UnidNome: 'UNIDADE DA DIREITA'},
+                2: {UnidId: 30, UnidCpfCnpj: 30, UnidNome: 'UNIDADE DA ESQUERDA'},
+                3: {UnidId: 40, UnidCpfCnpj: 40, UnidNome: 'UNIDADE CENTRAL'}
             }
             Unidades.forceCreate = true
             if (! await Unidades.saveAll(dataUnidades)) {
-                throw new Error('21 - '+Unidades.error)
+                throw new Error('20 - '+Unidades.error)
             }
 
             // instalando os municípios
             const Municipios = await getTable('mac.municipios')
             Municipios.forceCreate = true
             if (! await Municipios.createTable({delete: true})) {
-                throw new Error('22 - '+Municipios.error)
+                throw new Error('21 - '+Municipios.error)
             }
             // importando municipios
             const linhasMunicipios  = fs.readFileSync(MODULES + '/mac/config/schema/municipios_'+csvMunicipio+'.csv', 'utf8').toString().split('\n')
@@ -172,7 +169,7 @@ module.exports = app => {
                 csvLoop++
                 if (csvLoop >= 1000 || i >= (csvTotal-1)) {
                     if (! await Municipios.saveAll(dataMunicipios)) {
-                        throw new Error('23 - '+Municipios.error)
+                        throw new Error('22 - '+Municipios.error)
                     }
                     csvLoop         = 0
                     dataMunicipios  = []
@@ -182,78 +179,42 @@ module.exports = app => {
             // instalando usuarios
             const Usuarios = await getTable('mac.usuarios')
             if (! await Usuarios.createTable({delete: true})) {
-                throw new Error('24 - '+Usuarios.error)
+                throw new Error('23 - '+Usuarios.error)
             }
             let dataUsuarios = {
                 0: {
                     UsuaId: 1, UsuaNome: adminNome, UsuaEmail: adminEmail, UsuaSenha: adminSenha, UsuaSalario: 10000.19,
-                    Perfis: '[1,1,1]', 
-                    Unidades: '[10,20,30]'
+                    Perfis: '[1]', 
+                    Unidades: '[10]',
+                    Aplicacoes: '[1]'
                 }
             }
             Usuarios.forceCreate = true
             if (! await Usuarios.saveAll(dataUsuarios)) {
-                throw new Error('25 - '+Usuarios.error)
+                throw new Error('24 - '+Usuarios.error)
             }
 
             Usuarios.schema.token.hidden = false
             Usuarios.db.mask = false
             const dataUsuario = await Usuarios.find({'type': 'first', 'where':{'Usua.id':1}})
             if (!dataUsuario) {
-                throw new Error('26 - ' + __('Erro ao tentar recuperar dados do usuário!'))
-            }
-
-            // instalando papeis
-            const Papeis = await getTable('mac.papeis')
-            if (! await Papeis.createTable({delete: true})) {
-                throw new Error('27 - '+Papeis.error)
-            }
-            let dataPapeis = {
-                0: {
-                    PapeUsuarioId: 1,
-                    PapePerfilId: 1,
-                    PapeUnidadeId: 10
-                },
-                1: {
-                    PapeUsuarioId: 1,
-                    PapePerfilId: 1,
-                    PapeUnidadeId: 20
-                },
-                2: {
-                    PapeUsuarioId: 1,
-                    PapePerfilId: 1,
-                    PapeUnidadeId: 40
-                },
-                3: {
-                    PapeUsuarioId: 1,
-                    PapePerfilId: 2,
-                    PapeUnidadeId: 20
-                },
-                4: {
-                    PapeUsuarioId: 1,
-                    PapePerfilId: 3,
-                    PapeUnidadeId: 30
-                }
-            }
-            Papeis.forceCreate = true
-            if (! await Papeis.saveAll(dataPapeis)) {
-                throw new Error('28 - '+Papeis.error)
+                throw new Error('25 - ' + __('Erro ao tentar recuperar dados do usuário!'))
             }
 
             // instalando a auditoria
             const Auditorias = await getTable('mac.auditorias')
             if (! await Auditorias.createTable({delete:true})) {
-                throw new Error ('29 - ' + Auditorias.error)
+                throw new Error ('28 - ' + Auditorias.error)
             }
             global.USUARIO = {id: 1}
             if (! await Auditorias.auditar('Instalação da API realizada com sucesso.', 'instalacao')) {
-                throw new Error ('30 - ' + Auditorias.error)
+                throw new Error ('29 - ' + Auditorias.error)
             }
 
             // instalando as aplicações
             const Rotas = await getTable('mac.rotas')
             if (! await Rotas.createTable({delete:true})) {
-                throw new Error ('31 - '+Rotas.error)
+                throw new Error ('30 - '+Rotas.error)
             }
             let dataRotas = {
                 0: {
@@ -307,13 +268,13 @@ module.exports = app => {
             }
             Rotas.forceCreate = true
             if (! await Rotas.saveAll(dataRotas)) {
-                throw new Error('32 - '+Rotas.error)
+                throw new Error('31 - '+Rotas.error)
             }
 
             // instalando as aplicações
             const PerfisRotas = await getTable('mac.perfis_rotas')
             if (! await PerfisRotas.createTable({delete:true})) {
-                throw new Error ('33 - '+Rotas.error)
+                throw new Error ('32 - '+Rotas.error)
             }
             let dataPerfisRotas = {
                 0: {PerfRotaRotaId: 1, PerfRotaPerfilId: 1},
@@ -330,7 +291,7 @@ module.exports = app => {
             }
             PerfisRotas.forceCreate = true
             if (! await PerfisRotas.saveAll(dataPerfisRotas)) {
-                throw new Error('34 - '+PerfisRotas.error)
+                throw new Error('33 - '+PerfisRotas.error)
             }
 
             // criando o config geral
@@ -350,18 +311,18 @@ module.exports = app => {
             configText          += "module.exports = "+JSON.stringify(config, null, 2)
             fileSystem.writeFile('./config/config.js', configText, function(err) {
                 if (err) {
-                    throw new Error('35 - '+err)
+                    throw new Error('34 - '+err)
                 }
             })
 
             const fileSqlInstall = './modules/mac/config/schema/install_'+Auditorias.driver+'.sql'
             if (fileSystem.existsSync(fileSqlInstall)) {
                 if (! await Auditorias.db.query('DROP FUNCTION IF EXISTS MASK;')) {
-                    throw new Error('36 - '+__('Não foi possível excluir a função MASK!'))
+                    throw new Error('35 - '+__('Não foi possível excluir a função MASK!'))
                 }
                 let textoSql = fileSystem.readFileSync(fileSqlInstall, 'utf8').toString()
                 if (! await Auditorias.db.query(textoSql)) {
-                    throw new Error('37 - '+__('Não foi possível instalar o install de '+Auditorias.driver))
+                    throw new Error('36 - '+__('Não foi possível instalar o install de '+Auditorias.driver))
                 }
             }
 
