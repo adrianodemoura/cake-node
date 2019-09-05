@@ -355,6 +355,9 @@ class Finder extends Behavior {
                 }
 
                 if (this.associations[assoc].hasOne) {
+                    if (!!!this.associations[assoc].hasOne.table) {
+                        continue
+                    }
                     const assocHasOne           = await getTable(this.associations[assoc].hasOne.table)
                     const propHasOne            = objectClone(this.associations[assoc].hasOne)
                     const newFields             = []
@@ -383,6 +386,9 @@ class Finder extends Behavior {
                 }
 
                 if (this.associations[assoc].hasMany) {
+                    if (!!!this.associations[assoc].hasMany.table) {
+                        continue
+                    }
                     const assocHasMany          = await getTable(this.associations[assoc].hasMany.table)
                     const propHasMany           = objectClone(this.associations[assoc].hasMany)
                     const newFields             = []

@@ -784,6 +784,9 @@ class Crud extends Behavior {
                 if (!!!params.associations[Assoc].hasMany) {
                     continue
                 }
+                if (!!!this.associations[Assoc].hasMany.table) {
+                    continue
+                }
 
                 const assocHasMany = await getTable(this.associations[Assoc].hasMany.table)
 
@@ -870,7 +873,6 @@ class Crud extends Behavior {
                         throw new Error(__('Não foi possível criar Associações de '+this.table))
                     }
                 }
-
             }
 
             return true
