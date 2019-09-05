@@ -41,7 +41,7 @@ class Perfis extends Table {
 
         this.validations = {
             'nome': {
-                notEmpty: {when: ['create','update'], msg: __('O Campo nome é obrigatório !')},
+                notEmpty: {when: ['create'], msg: __('O Campo nome é obrigatório !')},
                 unique: {msg: __("O nome '{nome}' já foi cadastrado !")}
             }
         }

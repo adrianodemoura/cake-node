@@ -114,16 +114,6 @@ module.exports = app => {
             if (! await Perfis.createTable({delete: true})) {
                 throw new Error('17 - '+Perfis.error)
             }
-            let dataPerfis = {
-                0: {PerfId: 1, PerfNome: 'ADMINISTRADOR', PerfAplicacaoId: 1},
-                1: {PerfId: 2, PerfNome: 'SUPERVISOR', PerfAplicacaoId: 1},
-                2: {PerfId: 3, PerfNome: 'USUÁRIO', PerfAplicacaoId: 1},
-                3: {PerfId: 4, PerfNome: 'VISITANTE', PerfAplicacaoId: 1}
-            }
-            Perfis.forceCreate = true
-            if (! await Perfis.saveAll(dataPerfis)) {
-                throw new Error('18 - '+Perfis.error)
-            }
 
             // instalando as unidades
             const Unidades = await getTable('mac.unidades')
@@ -131,10 +121,7 @@ module.exports = app => {
                 throw new Error('19 - '+Unidades.error)
             }
             let dataUnidades = {
-                0: {UnidId: 10, UnidCpfCnpj: 10, UnidNome: 'UNIDADE GERAL'},
-                1: {UnidId: 20, UnidCpfCnpj: 20, UnidNome: 'UNIDADE DA DIREITA'},
-                2: {UnidId: 30, UnidCpfCnpj: 30, UnidNome: 'UNIDADE DA ESQUERDA'},
-                3: {UnidId: 40, UnidCpfCnpj: 40, UnidNome: 'UNIDADE CENTRAL'}
+                0: {UnidId: 10, UnidCpfCnpj: 10, UnidNome: 'UNIDADE GERAL'}
             }
             Unidades.forceCreate = true
             if (! await Unidades.saveAll(dataUnidades)) {
@@ -176,10 +163,43 @@ module.exports = app => {
                 }
             }
 
+            // instalando as aplicações
+            const Rotas = await getTable('mac.rotas')
+            if (! await Rotas.createTable({delete:true})) {
+                throw new Error ('23 - '+Rotas.error)
+            }
+            let dataRotas = {
+                0: {RotaRota: '/listar', RotaAplicacaoId: 1},
+                1: {RotaRota: '/salvar', RotaAplicacaoId: 1},
+                2: {RotaRota: '/excluir', RotaAplicacaoId: 1},
+                3: {RotaRota: '/rotas', RotaAplicacaoId: 1},
+                4: {RotaRota: '/fake', RotaAplicacaoId: 1},
+                5: {RotaRota: '/cadastros', RotaAplicacaoId: 1},
+                6: {RotaRota: '/info', RotaAplicacaoId: 1},
+                7: {RotaRota: '/instalacao', RotaAplicacaoId: 1},
+                8: {RotaRota: '/meu_token', RotaAplicacaoId: 1},
+                9: {RotaRota: '/nova_senha', RotaAplicacaoId: 1},
+                10: {RotaRota: '/novo_token', RotaAplicacaoId: 1},
+            }
+            Rotas.forceCreate = true
+            if (! await Rotas.saveAll(dataRotas)) {
+                throw new Error('24 - '+Rotas.error)
+            }
+
+            // salvando os perfis
+            let dataPerfis = {
+                0: {PerfId: 1, PerfNome: 'ADMINISTRADOR', PerfAplicacaoId: 1},
+                1: {PerfId: 2, PerfNome: 'DESENVOLVEDOR', PerfAplicacaoId: 1}
+            }
+            Perfis.forceCreate = true
+            if (! await Perfis.saveAll(dataPerfis)) {
+                throw new Error('25 - '+Perfis.error)
+            }
+
             // instalando usuarios
             const Usuarios = await getTable('mac.usuarios')
             if (! await Usuarios.createTable({delete: true})) {
-                throw new Error('23 - '+Usuarios.error)
+                throw new Error('26 - '+Usuarios.error)
             }
             let dataUsuarios = {
                 0: {
@@ -191,110 +211,37 @@ module.exports = app => {
             }
             Usuarios.forceCreate = true
             if (! await Usuarios.saveAll(dataUsuarios)) {
-                throw new Error('24 - '+Usuarios.error)
+                throw new Error('27 - '+Usuarios.error)
             }
 
             Usuarios.schema.token.hidden = false
             Usuarios.db.mask = false
             const dataUsuario = await Usuarios.find({'type': 'first', 'where':{'Usua.id':1}})
             if (!dataUsuario) {
-                throw new Error('25 - ' + __('Erro ao tentar recuperar dados do usuário!'))
+                throw new Error('28 - ' + __('Erro ao tentar recuperar dados do usuário!'))
+            }
+
+            // criando a vinculação do usuário admin
+            dataPerfis = {
+                0: {PerfId: 1, Rotas: '[1,2,3,4,5,6,7,8,9,10,11]'},
+                1: {PerfId: 2, Rotas: '[1,2,3,4,5,6,7,8,9,10,11]'}
+            }
+            Perfis.forceCreate = false
+            if (! await Perfis.saveAll(dataPerfis)) {
+                throw new Error('29 - '+Perfis.error)
             }
 
             // instalando a auditoria
             const Auditorias = await getTable('mac.auditorias')
             if (! await Auditorias.createTable({delete:true})) {
-                throw new Error ('28 - ' + Auditorias.error)
+                throw new Error ('30 - ' + Auditorias.error)
             }
             global.USUARIO = {id: 1}
             if (! await Auditorias.auditar('Instalação da API realizada com sucesso.', 'instalacao')) {
-                throw new Error ('29 - ' + Auditorias.error)
+                throw new Error ('31 - ' + Auditorias.error)
             }
 
-            // instalando as aplicações
-            const Rotas = await getTable('mac.rotas')
-            if (! await Rotas.createTable({delete:true})) {
-                throw new Error ('30 - '+Rotas.error)
-            }
-            let dataRotas = {
-                0: {
-                    RotaRota: '/listar',
-                    RotaAplicacaoId: 1
-                },
-                1: {
-                    RotaRota: '/salvar',
-                    RotaAplicacaoId: 1
-                },
-                2: {
-                    RotaRota: '/excluir',
-                    RotaAplicacaoId: 1
-                },
-                3: {
-                    RotaRota: '/rotas',
-                    RotaAplicacaoId: 1
-                },
-                4: {
-                    RotaRota: '/fake',
-                    RotaAplicacaoId: 1
-                },
-                5: {
-                    RotaRota: '/cadastros',
-                    RotaAplicacaoId: 1
-                },
-                6: {
-                    RotaRota: '/info',
-                    RotaAplicacaoId: 1
-                },
-                7: {
-                    RotaRota: '/instalacao',
-                    RotaAplicacaoId: 1
-                },
-                8: {
-                    RotaRota: '/meu_token',
-                    RotaAplicacaoId: 1
-                },
-                9: {
-                    RotaRota: '/nova_senha',
-                    RotaAplicacaoId: 1
-                },
-                10: {
-                    RotaRota: '/novo_token',
-                    RotaAplicacaoId: 1
-                },
-                11: {
-                    RotaRota: '/minhas_rotas',
-                    RotaAplicacaoId: 1
-                }
-            }
-            Rotas.forceCreate = true
-            if (! await Rotas.saveAll(dataRotas)) {
-                throw new Error('31 - '+Rotas.error)
-            }
-
-            // instalando as aplicações
-            const PerfisRotas = await getTable('mac.perfis_rotas')
-            if (! await PerfisRotas.createTable({delete:true})) {
-                throw new Error ('32 - '+Rotas.error)
-            }
-            let dataPerfisRotas = {
-                0: {PerfRotaRotaId: 1, PerfRotaPerfilId: 1},
-                1: {PerfRotaRotaId: 2, PerfRotaPerfilId: 1},
-                2: {PerfRotaRotaId: 3, PerfRotaPerfilId: 1},
-                3: {PerfRotaRotaId: 4, PerfRotaPerfilId: 1},
-                4: {PerfRotaRotaId: 5, PerfRotaPerfilId: 1},
-                5: {PerfRotaRotaId: 6, PerfRotaPerfilId: 1},
-                6: {PerfRotaRotaId: 7, PerfRotaPerfilId: 1},
-                7: {PerfRotaRotaId: 8, PerfRotaPerfilId: 1},
-                8: {PerfRotaRotaId: 9, PerfRotaPerfilId: 1},
-                9: {PerfRotaRotaId: 10, PerfRotaPerfilId: 1},
-                10: {PerfRotaRotaId: 11, PerfRotaPerfilId: 1}
-            }
-            PerfisRotas.forceCreate = true
-            if (! await PerfisRotas.saveAll(dataPerfisRotas)) {
-                throw new Error('33 - '+PerfisRotas.error)
-            }
-
-            // criando o config geral
+            // criando a config geral
             config.salt         = geraToken()
             const fileSystem    = require('fs')
             let configText      = ""
@@ -311,18 +258,19 @@ module.exports = app => {
             configText          += "module.exports = "+JSON.stringify(config, null, 2)
             fileSystem.writeFile('./config/config.js', configText, function(err) {
                 if (err) {
-                    throw new Error('34 - '+err)
+                    throw new Error('32 - '+err)
                 }
             })
 
+            // pós-install
             const fileSqlInstall = './modules/mac/config/schema/install_'+Auditorias.driver+'.sql'
             if (fileSystem.existsSync(fileSqlInstall)) {
                 if (! await Auditorias.db.query('DROP FUNCTION IF EXISTS MASK;')) {
-                    throw new Error('35 - '+__('Não foi possível excluir a função MASK!'))
+                    throw new Error('33 - '+__('Não foi possível excluir a função MASK!'))
                 }
                 let textoSql = fileSystem.readFileSync(fileSqlInstall, 'utf8').toString()
                 if (! await Auditorias.db.query(textoSql)) {
-                    throw new Error('36 - '+__('Não foi possível instalar o install de '+Auditorias.driver))
+                    throw new Error('34 - '+__('Não foi possível instalar o install de '+Auditorias.driver))
                 }
             }
 
