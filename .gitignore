@@ -3,6 +3,8 @@
 /tmp/logs/*
 !/tmp/logs/empty
 
+config/config.js
+
 node_modules/*
 
 .env
