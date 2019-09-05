@@ -113,6 +113,16 @@ class Usuarios extends Table {
         if (this.validationType === 'create') {
             this.data['UsuaToken'] = geraToken()
         }
+        if (this.data['Perfis'] || this.data['Unidades']) {
+            const totPerfis     = (this.data['Perfis'].split(',').length)
+            const totUnidades   = (this.data['Unidades'].split(',').length)
+            if (totPerfis !== totUnidades) {
+                throw new Error(__('O Total de Perfis está diferente do total de Unidades!'))
+            }
+            let stringAplicacoes    = (""+configure('codigo_sistema')+",").repeat(totPerfis)
+            stringAplicacoes        = stringAplicacoes.substring(0, stringAplicacoes.length-1)
+            this.data['Aplicacoes'] = "["+stringAplicacoes+"]"
+        }
 
         return true
     }

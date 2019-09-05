@@ -108,6 +108,7 @@ module.exports = app => {
             if (! await Aplicacoes.save(dataAplicacoes)) {
                 throw new Error('16 - ' + Aplicacoes.error)
             }
+            config.codigoSistema = 1
 
             // instalando os perfis
             const Perfis = await getTable('mac.perfis')
@@ -121,7 +122,9 @@ module.exports = app => {
                 throw new Error('19 - '+Unidades.error)
             }
             let dataUnidades = {
-                0: {UnidId: 10, UnidCpfCnpj: 10, UnidNome: 'UNIDADE GERAL'}
+                0: {UnidId: 10, UnidCpfCnpj: 10, UnidNome: 'UNIDADE GERAL'},
+                1: {UnidId: 20, UnidCpfCnpj: 20, UnidNome: 'UNIDADE OESTE'},
+                3: {UnidId: 30, UnidCpfCnpj: 30, UnidNome: 'UNIDADE LESTE'}
             }
             Unidades.forceCreate = true
             if (! await Unidades.saveAll(dataUnidades)) {
@@ -189,7 +192,8 @@ module.exports = app => {
             // salvando os perfis
             let dataPerfis = {
                 0: {PerfId: 1, PerfNome: 'ADMINISTRADOR', PerfAplicacaoId: 1},
-                1: {PerfId: 2, PerfNome: 'DESENVOLVEDOR', PerfAplicacaoId: 1}
+                1: {PerfId: 2, PerfNome: 'DESENVOLVEDOR', PerfAplicacaoId: 1},
+                2: {PerfId: 3, PerfNome: 'SUPERVISOR', PerfAplicacaoId: 1}
             }
             Perfis.forceCreate = true
             if (! await Perfis.saveAll(dataPerfis)) {
@@ -204,9 +208,8 @@ module.exports = app => {
             let dataUsuarios = {
                 0: {
                     UsuaId: 1, UsuaNome: adminNome, UsuaEmail: adminEmail, UsuaSenha: adminSenha, UsuaSalario: 10000.19,
-                    Perfis: '[1]', 
-                    Unidades: '[10]',
-                    Aplicacoes: '[1]'
+                    Perfis: '[1,2,3]', 
+                    Unidades: '[10,20,30]'
                 }
             }
             Usuarios.forceCreate = true
@@ -223,8 +226,7 @@ module.exports = app => {
 
             // criando a vinculação do usuário admin
             dataPerfis = {
-                0: {PerfId: 1, Rotas: '[1,2,3,4,5,6,7,8,9,10,11]'},
-                1: {PerfId: 2, Rotas: '[1,2,3,4,5,6,7,8,9,10,11]'}
+                0: {PerfId: 1, Rotas: '[1,2,3,4,5,6,7,8,9,10,11]'}
             }
             Perfis.forceCreate = false
             if (! await Perfis.saveAll(dataPerfis)) {

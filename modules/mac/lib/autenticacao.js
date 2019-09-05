@@ -52,6 +52,7 @@ module.exports = async function(params) {
         if (! await Usuarios.updateAll(fields, where)) {
             throw new Error(Usuarios.error)
         }
+        gravaLog(dataUsuario, 'dataUsuario')
 
         // atualizando o global com os dados do usuário
         global.USUARIO = {

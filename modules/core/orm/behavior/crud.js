@@ -445,7 +445,7 @@ class Crud extends Behavior {
                     if (this.debug) {
                         console.log(sqlDel)
                     }
-                    throw new Error(__('Erro ao tentar limpar relacionamentos de '+table))
+                    throw new Error(__('Erro ao tentar limpar relacionamentos!'))
                 }
             }
 
@@ -454,7 +454,7 @@ class Crud extends Behavior {
                 for (let l in tableInsert[table]) {
                     let sqlInsert = tableInsert[table][l]
                     if (! await this.query(sqlInsert)) {
-                        throw new Error(__('Erro ao tentar salvar relacionamento '+table))
+                        throw new Error(__('Erro ao tentar salvar relacionamento!'))
                     }
                     let assocAffectedRows   = await this.db.getAffectedRows(table)
                 }
