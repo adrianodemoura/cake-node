@@ -21,19 +21,11 @@ class Usuarios extends Table {
         this.associations = {
             Municipio: {
                 hasOne: {
-                    table: 'mac.municipios', 
                     foreignKeyLeft: 'municipio_id'
-                }
-            },
-            Papeis: {
-                hasMany: {
-                    tableRight: 'vinculacoes',
-                    foreignKeyRight: 'usuario_id'
                 }
             },
             Perfis: {
                 hasMany: { 
-                    table: 'mac.perfis', 
                     tableBridge: 'vinculacoes',
                     foreignKeyBridgeLeft: 'usuario_id', 
                     foreignKeyBridgeRight: 'perfil_id'
@@ -41,7 +33,6 @@ class Usuarios extends Table {
             },
             Unidades: {
                 hasMany: { 
-                    table: 'mac.unidades', 
                     tableBridge: 'vinculacoes',
                     foreignKeyBridgeLeft: 'usuario_id', 
                     foreignKeyBridgeRight: 'unidade_id'
@@ -49,7 +40,6 @@ class Usuarios extends Table {
             },
             Aplicacoes: {
                 hasMany: { 
-                    table: 'mac.Aplicacoes', 
                     tableBridge: 'vinculacoes',
                     foreignKeyBridgeLeft: 'usuario_id', 
                     foreignKeyBridgeRight: 'aplicacao_id'

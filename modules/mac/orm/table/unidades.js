@@ -21,7 +21,6 @@ class Unidades extends Table {
         this.associations = {
             Aplicacoes: {
                 hasMany: {
-                    table: 'mac.aplicacoes', 
                     tableBridge: 'vinculacoes',
                     foreignKeyBridgeLeft: 'unidade_id', 
                     foreignKeyBridgeRight: 'aplicacao_id'
@@ -29,7 +28,6 @@ class Unidades extends Table {
             },
             Perfis: {
                 hasMany: { 
-                    table: 'mac.perfis', 
                     tableBridge: 'vinculacoes',
                     foreignKeyBridgeLeft: 'unidade_id', 
                     foreignKeyBridgeRight: 'perfil_id'
@@ -37,7 +35,6 @@ class Unidades extends Table {
             },
             Usuarios: {
                 hasMany: { 
-                    table: 'mac.usuarios', 
                     tableBridge: 'vinculacoes',
                     foreignKeyBridgeLeft: 'unidade_id', 
                     foreignKeyBridgeRight: 'usuario_id'

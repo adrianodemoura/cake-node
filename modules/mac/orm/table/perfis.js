@@ -19,11 +19,12 @@ class Perfis extends Table {
 
         this.associations = {
             Aplicacao: {
-                hasOne: { table: 'mac.aplicacoes', foreignKeyLeft: 'aplicacao_id'}
+                hasOne: {
+                    foreignKeyLeft: 'aplicacao_id'
+                }
             },
             Usuarios: {
                 hasMany: { 
-                    table: 'mac.usuarios', 
                     tableBridge: 'vinculacoes',
                     foreignKeyBridgeLeft: 'perfil_id', 
                     foreignKeyBridgeRight: 'usuario_id'
@@ -31,7 +32,6 @@ class Perfis extends Table {
             },
             Rotas: {
                 hasMany: { 
-                    table: 'mac.rotas', 
                     tableBridge: 'perfis_rotas',
                     foreignKeyBridgeLeft: 'perfil_id', 
                     foreignKeyBridgeRight: 'rota_id'

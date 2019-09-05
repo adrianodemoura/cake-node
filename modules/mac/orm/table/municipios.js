@@ -20,7 +20,6 @@ class Municipios extends Table {
         this.associations = {
             Usuarios: {
                 hasMany: {
-                    table: 'mac.usuarios',
                     tableRight: 'usuarios',
                     foreignKeyRight: 'municipio_id'
                 }
@@ -29,7 +28,10 @@ class Municipios extends Table {
 
         this.validations = {
             'nome': {
-                notEmpty: {when: ['create','update'], msg: __('O Campo ativo é obrigatório')}
+                notEmpty: {
+                    when: ['create','update'],
+                    msg: __('O Campo ativo é obrigatório')
+                }
             }
         }
 
