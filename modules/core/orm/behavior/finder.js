@@ -282,6 +282,8 @@ class Finder extends Behavior {
                 throw new Error(__('Campos do lado direito inválidos!'))
             }
 
+            params.aliasRight = params.aliasRight || params.tableRight.fourAlias().capitalize()
+
             sql = 'SELECT fieldsRight FROM tableRight aliasRight'
 
             if (params.tableBridge) {
@@ -312,7 +314,7 @@ class Finder extends Behavior {
 
                     newFieldsRight += this.getAliasField(field, params.schema[field], params.aliasRight)
                 }
-                params.fields = newFieldsRight
+                params.fields = (newFieldsRight.length>0) ? newFieldsRight : '*'
             }
 
             sql = sql.replace('fieldsRight', params.fields)

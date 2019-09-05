@@ -25,6 +25,12 @@ class Usuarios extends Table {
                     foreignKeyLeft: 'municipio_id'
                 }
             },
+            Papeis: {
+                hasMany: {
+                    tableRight: 'vinculacoes',
+                    foreignKeyRight: 'usuario_id'
+                }
+            },
             Perfis: {
                 hasMany: { 
                     table: 'mac.perfis', 

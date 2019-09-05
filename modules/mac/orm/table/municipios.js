@@ -2,11 +2,11 @@
  * Table Municipios
  * 
  * @author      Adriano Moura
- * @package     app.Module.Orm.Table
+ * @package     app.module.orm.table
  */
 'use strict'
 /**
- * Mantém a tabela de usuários.
+ * Mantém a tabela de municipios.
  */
 const Table = require (CORE + '/orm/table.js')
 class Municipios extends Table {
@@ -19,7 +19,11 @@ class Municipios extends Table {
 
         this.associations = {
             Usuarios: {
-                hasMany: { table: 'mac.usuarios', tableRight: 'usuarios', foreignKeyRight: 'municipio_id'}
+                hasMany: {
+                    table: 'mac.usuarios',
+                    tableRight: 'usuarios',
+                    foreignKeyRight: 'municipio_id'
+                }
             }
         }
 
