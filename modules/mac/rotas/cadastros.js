@@ -23,7 +23,15 @@ module.exports = app => {
             // retornando
             retorno.status      = true
             retorno.msg         = __('Rota %mac/cadastros% consumida com sucesso.')
-            retorno.cadastros   = ['mac.usuarios', 'mac.municipios', 'mac.perfis', 'mac.unidades', 'mac.auditorias']
+            retorno.cadastros   = [
+                'mac.aplicacoes', 
+                'mac.auditorias',
+                'mac.municipios', 
+                'mac.perfis', 
+                'mac.rotas',
+                'mac.unidades', 
+                'mac.usuarios', 
+            ]
         } catch (error) {
             retorno.status  = false
             retorno.msg     = error.message
