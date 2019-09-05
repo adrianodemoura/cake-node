@@ -119,9 +119,7 @@ class Usuarios extends Table {
             if (totPerfis !== totUnidades) {
                 throw new Error(__('O Total de Perfis está diferente do total de Unidades!'))
             }
-            let stringAplicacoes    = (""+configure('codigo_sistema')+",").repeat(totPerfis)
-            stringAplicacoes        = stringAplicacoes.substring(0, stringAplicacoes.length-1)
-            this.data['Aplicacoes'] = "["+stringAplicacoes+"]"
+            this.data['Aplicacoes'] = "["+(""+configure('codigo_sistema')+",").repeat(totPerfis).slice(0,-1)+"]"
         }
 
         return true
