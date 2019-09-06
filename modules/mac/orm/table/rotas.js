@@ -20,16 +20,19 @@ class Rotas extends Table {
         this.associations = {
             Aplicacoes: {
                 hasOne: {
-                    table:                  'mac.aplicacoes', 
-                    foreignKeyLeft:         'aplicacao_id',
+                    foreignKeyLeft: 'aplicacao_id',
+                    tableRight: 'aplicacoes',
+                    foreignKeyRight: 'id'
                 }
             },
             Perfis: {
-                hasMany: { 
-                    table:                  'mac.perfis',  
-                    tableBridge:            'perfis_rotas', 
-                    foreignKeyBridgeLeft:   'rota_id', 
-                    foreignKeyBridgeRight:  'perfil_id'
+                hasMany: {
+                    foreignKeyLeft: 'id',
+                    tableBridge: 'permissoes', 
+                    foreignKeyBridgeLeft: 'rota_id', 
+                    foreignKeyBridgeRight: 'perfil_id',
+                    tableRight: 'perfis',
+                    foreignKeyRight: 'id'
                 }
             },
         }
@@ -40,7 +43,19 @@ class Rotas extends Table {
                 unique: {msg: __("A Rota '{nome}' já foi cadastrada!")}
             }
         }
+    }
 
+    /**
+     * Método antes de validar
+     * - força o id da aplicação.
+     *
+     * @param   {Object}    data        Dados do registro.
+     * @return  {Boolean}   boolean     Verdadeiro se deve continuar, Falso se não.
+     */
+    async beforeValidate() {
+        this.data['RotaAplicacaoId'] = configure('codigo_sistema')
+
+        return true
     }
 }
 

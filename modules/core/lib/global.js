@@ -379,6 +379,18 @@ String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
 }
 
+String.prototype.fourAlias = function() {
+    let string  = this.replace(/([A-Z])/g, ' $1')
+    let arr     = string.split(' ')
+    let alias   = ''
+    for (let i in arr) {
+        if (arr[i]) {
+            alias += arr[i].substr(0,4)
+        }
+    }
+    return alias
+}
+
 String.prototype.undoAlias = function() {
     let undo = this.replace(/([A-Z])/g, ' $1').trim().replace(' ','.').replace(' ','_')
     return undo

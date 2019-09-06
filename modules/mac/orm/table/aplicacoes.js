@@ -20,19 +20,30 @@ class Aplicacoes extends Table {
         // associações
         this.associations = {
             Rotas: {
-                hasMany: { 
-                    table:                  'mac.rotas', 
-                    tableBridge:            'aplicacoes_rotas', 
-                    foreignKeyBridgeLeft:   'aplicacao_id', 
-                    foreignKeyBridgeRight:  'rota_id'
+                hasMany: {
+                    foreignKeyLeft:         'id',
+                    tableRight:             'rotas',
+                    foreignKeyRight:        'aplicacao_id'
+                }
+            },
+            Perfis: {
+                hasMany: {
+                    foreignKeyLeft:         'id',
+                    tableRight:             'perfis',
+                    foreignKeyRight:        'aplicacao_id'
                 }
             }
         }
 
         this.validations = {
             'nome': {
-                notEmpty: {when: ['create','update'], msg: __('O Campo nome é obrigatório !')},
-                unique: {msg: __("A Aplicação '{nome}' já foi cadastrada!")}
+                notEmpty: {
+                    when: ['create','update'],
+                    msg: __('O Campo nome é obrigatório !')
+                },
+                unique: {
+                    msg: __("A Aplicação '{nome}' já foi cadastrada!")
+                }
             }
         }
 

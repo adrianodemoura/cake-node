@@ -51,11 +51,10 @@ class Crud extends Behavior {
             sql = 'INSERT INTO '+this.table+' (fields) VALUES (values)'        
         }
 
-        for(let aliasField in this.data) {
-            let undoAliasField  = aliasField.undoAlias().toLowerCase()
-            let arrUndoAlias    = undoAliasField.split('.')
-            let field           = arrUndoAlias[1] || ''
-            if (! this.schema[field]) {
+        for (let field in this.schema) {
+            let aliasField      = this.name.fourAlias()+field.humanize()
+
+            if (!!! this.data[aliasField] ) {
                 continue
             }
 
@@ -443,7 +442,10 @@ class Crud extends Behavior {
             for (let table in tableClean) {
                 let sqlDel = 'DELETE FROM '+table+' WHERE '+tableClean[table]
                 if (! await this.query(sqlDel)) {
-                    throw new Error(__('Erro ao tentar limpar relacionamentos de '+table))
+                    if (this.debug) {
+                        console.log(sqlDel)
+                    }
+                    throw new Error(__('Erro ao tentar limpar relacionamentos!'))
                 }
             }
 
@@ -452,7 +454,7 @@ class Crud extends Behavior {
                 for (let l in tableInsert[table]) {
                     let sqlInsert = tableInsert[table][l]
                     if (! await this.query(sqlInsert)) {
-                        throw new Error(__('Erro ao tentar salvar relacionamento '+table))
+                        throw new Error(__('Erro ao tentar salvar relacionamento!'))
                     }
                     let assocAffectedRows   = await this.db.getAffectedRows(table)
                 }
@@ -743,23 +745,25 @@ class Crud extends Behavior {
             params.fields       = objectClone(this.schema)
             params.associations = objectClone(this.associations)
 
+            const listTables    = await this.db.listTables()
+
             if (params.delete) {
                 if (! await this.db.dropTable(this.table) ) {
                     throw new Error('Não foi possível excluir a tabela %'+params.table+'%')
                 }
             }
 
+            // criando tabelas hasOne
             for(let Assoc in params.associations) {
                 if (!!! params.associations[Assoc].hasOne) {
                     continue
                 }
-                const assocHasOne = await getTable(params.associations[Assoc].hasOne.table)
-
-                if (!!! params.associations[Assoc].hasOne.tableRight ) {
-                    params.associations[Assoc].hasOne.tableRight = assocHasOne.table
+                if (!!! params.associations[Assoc].hasOne.tableRight) {
+                    throw new Error(__('O Parâmetro tableRight não foi informado na associação hasOne de '+this.name+'.'+Assoc))
                 }
+
                 if (!!! params.associations[Assoc].hasOne.foreignKeyRight ) {
-                    params.associations[Assoc].hasOne.foreignKeyRight = assocHasOne.primaryKey
+                    throw new Error(__('O Parâmetro foreignKeyRight não foi informado na associação hasOne de '+this.name+'.'+Assoc))
                 }
             }
 
@@ -776,24 +780,22 @@ class Crud extends Behavior {
             let fieldLeft       = ''
             let fieldRight      = ''
 
+            // criando tabelas hasOne
             for(let Assoc in params.associations) {
                 if (!!!params.associations[Assoc].hasMany) {
                     continue
                 }
-
-                const assocHasMany = await getTable(this.associations[Assoc].hasMany.table)
-
-                if (!!! params.associations[Assoc].hasMany.tableRight ) {
-                    params.associations[Assoc].hasMany.tableRight = assocHasMany.table
+                if (!!! params.associations[Assoc].hasMany.tableRight) {
+                    throw new Error(__('O Parâmetro tableRight não foi informado na associação hasMany '+this.name+'.'+Assoc))
                 }
-                if (!!! params.associations[Assoc].hasMany.foreignKeyLeft ) {
-                    params.associations[Assoc].hasMany.foreignKeyLeft = this.primaryKey
+                if (!!! params.associations[Assoc].hasMany.foreignKeyRight) {
+                    throw new Error(__('O Parâmetro foreignKeyRight não foi informado na associação hasMany '+this.name+'.'+Assoc))
                 }
-                if (!!! params.associations[Assoc].hasMany.foreignKeyRight ) {
-                    params.associations[Assoc].hasMany.foreignKeyRight = assocHasMany.primaryKey
+                if (!!! params.associations[Assoc].hasMany.foreignKeyLeft) {
+                    throw new Error(__('O Parâmetro foreignKeyLeft não foi informado na associação hasMany '+this.name+'.'+Assoc))
                 }
 
-                tableBridge = params.associations[Assoc].hasMany.tableBridge
+                const tableBridge = params.associations[Assoc].hasMany.tableBridge
                 paramsHasmany['table'] = tableBridge
 
                 tableRight  = params.associations[Assoc].hasMany.tableRight
@@ -802,6 +804,9 @@ class Crud extends Behavior {
                 fieldBridge = params.associations[Assoc].hasMany.foreignKeyBridgeLeft
 
                 if (allTables.indexOf(tableRight) < 0) {
+                    if (this.debug) {
+                        console.log(__('A tabela %'+tableRight+'% já foi instalada!'))
+                    }
                     continue
                 }
 
@@ -827,20 +832,52 @@ class Crud extends Behavior {
                 paramsHasmany.associations[Assoc]['hasOne']['foreignKeyLeft'] = fieldLeft
                 paramsHasmany.associations[Assoc]['hasOne']['foreignKeyRight']= params.associations[Assoc].hasMany.foreignKeyRight || 'id'
                 paramsHasmany.associations[Assoc]['hasOne']['tableRight']     = tableRight
-
             }
 
             if (Object.keys(paramsHasmany.fields).length) {
                 let sqlCreateHasMany = this.db.getSqlCreate(paramsHasmany)
-                if (! this.query(sqlCreateHasMany) ) {
-                    console.log(this.error)
-                    throw new Error(__('Não foi possível criar Associações de '+this.table))
+
+                if (listTables.indexOf(paramsHasmany.table) > -1) {
+                    const allFieldsHM   = await this.db.getAllFields(paramsHasmany.table)
+                    let newFields       = []
+                    for (let fieldHM in paramsHasmany.fields) {
+                        if (!!! allFieldsHM[fieldHM]) {
+                            newFields[fieldHM] = paramsHasmany.fields[fieldHM]
+                        }
+                    }
+                    for (let field in newFields) {
+                        let paramsNewColumn     = newFields[field]
+                        let paramsNewConstrant  = {}
+                        
+                        paramsNewColumn.field   = field
+                        paramsNewColumn.table   = paramsHasmany.table
+                        
+                        paramsNewConstrant.table        = paramsHasmany.table
+                        paramsNewConstrant.fieldRight   = field
+                        paramsNewConstrant.tableRight   = this.table
+                        paramsNewConstrant.tableRightPk = this.primaryKey
+
+                        if (! await this.db.addColumn(paramsNewColumn)) {
+                            throw new Error (__('Não foi possível incluir novos campos na tabela %'+paramsNewColumn.table+'%'))
+                        }
+                        if (! await this.db.addConstraint(paramsNewConstrant)) {
+                            throw new Error (__('Não foi possível incluir uma nova constrant para a tabela %'+paramsNewConstrant+'%'))
+                        }
+                    }
+                } else {
+                    if (! this.query(sqlCreateHasMany) ) {
+                        console.log(this.error)
+                        throw new Error(__('Não foi possível criar Associações de '+this.table))
+                    }
                 }
             }
 
             return true
         } catch (e) {
             this.error = e.message
+            if (this.debug) {
+                console.log(this.error)
+            }
             return false
         }
     }

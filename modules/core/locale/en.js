@@ -66,5 +66,7 @@ module.exports = {
 	'Não foi possível identificar o campo do filtro!': 'Could not identify filter field!',
 	'Nenhum registro sofreu atualização!': 'No records found to update!',
 	"O cadastro % não pode ser populado!": "The '%' registration cannot be populated!",
-	"Não foi possível recuperar o valor relacionado de %": "Could not retrieve related value from '%'"
+	"Não foi possível recuperar o valor relacionado de %": "Could not retrieve related value from '%'",
+	'Erro ao tentar limpar relacionamentos!': 'Error trying to clear relationships!',
+	'Erro ao tentar salvar relacionamento!': 'Error trying to save relationships!'
 }

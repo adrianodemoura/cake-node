@@ -21,24 +21,40 @@ class Usuarios extends Table {
         this.associations = {
             Municipio: {
                 hasOne: {
-                    table:                  'mac.municipios', 
-                    foreignKeyLeft:         'municipio_id',
+                    foreignKeyLeft: 'municipio_id',
+                    tableRight: 'municipios',
+                    foreignKeyRight: 'id'
                 }
             },
             Perfis: {
-                hasMany: { 
-                    table:                  'mac.perfis',  
-                    tableBridge:            'associacoes', 
-                    foreignKeyBridgeLeft:   'usuario_id', 
-                    foreignKeyBridgeRight:  'perfil_id'
+                hasMany: {
+                    foreignKeyLeft: 'id',
+                    tableBridge: 'papeis',
+                    foreignKeyBridgeLeft: 'usuario_id', 
+                    foreignKeyBridgeRight: 'perfil_id',
+                    tableRight: 'perfis',
+                    foreignKeyRight: 'id',
+
                 }
             },
             Unidades: {
+                hasMany: {
+                    foreignKeyLeft: 'id',
+                    tableBridge: 'papeis',
+                    foreignKeyBridgeLeft: 'usuario_id', 
+                    foreignKeyBridgeRight: 'unidade_id',
+                    tableRight: 'perfis',
+                    foreignKeyRight: 'id'
+                }
+            },
+            Aplicacoes: {
                 hasMany: { 
-                    table:                  'mac.unidades', 
-                    tableBridge:            'associacoes', 
-                    foreignKeyBridgeLeft:   'usuario_id', 
-                    foreignKeyBridgeRight:  'unidade_id'
+                    foreignKeyLeft: 'id',
+                    tableBridge: 'papeis',
+                    foreignKeyBridgeLeft: 'usuario_id', 
+                    foreignKeyBridgeRight: 'aplicacao_id',
+                    tableRight: 'aplicacoes',
+                    foreignKeyRight: 'id'
                 }
             }
         }
@@ -105,8 +121,29 @@ class Usuarios extends Table {
         if (this.validationType === 'create') {
             this.data['UsuaToken'] = geraToken()
         }
+        if (this.data['Perfis'] || this.data['Unidades']) {
+            const totPerfis     = (this.data['Perfis'].split(',').length)
+            const totUnidades   = (this.data['Unidades'].split(',').length)
+            if (totPerfis !== totUnidades) {
+                throw new Error(__('O Total de Perfis está diferente do total de Unidades!'))
+            }
+            this.data['Aplicacoes'] = "["+(""+configure('codigo_sistema')+",").repeat(totPerfis).slice(0,-1)+"]"
+        }
 
         return true
+    }
+
+    /**
+     * Retorna as rotas do usuários
+     *
+     * @param   {Integer}   idUsuario   Id do usuário.
+     * @param   {Integer}   idPerfil    Código do papel, no formato IdUsuario,IdPerfil,IdUnidade.
+     * @return  {Object}    rotas       Lista de rotas do usuário pelo seu papel
+     */
+    async getMinhasRotas(idUsuario=0, codigoPapel=0) {
+        let rotas = {}
+
+        return rotas
     }
 
 }

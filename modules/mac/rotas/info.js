@@ -19,7 +19,6 @@ module.exports = app => {
         const retorno = {}
 
         try {
-
             // retornando
             retorno.status      = true
             retorno.msg         = __('Bem vindo.')

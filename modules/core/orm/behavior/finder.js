@@ -28,7 +28,7 @@ class Finder extends Behavior {
                 console.log(testErrors[i])
             }
         }
-        
+
         return testErrors
     }
 
@@ -278,22 +278,30 @@ class Finder extends Behavior {
             if (!!!params.tableRight) {
                 throw new Error(__('Tabela do lado direito inválida!'))
             }
-
             if (!!!params.fields) {
                 throw new Error(__('Campos do lado direito inválidos!'))
             }
+
+            params.aliasRight = params.aliasRight || params.tableRight.fourAlias().capitalize()
 
             sql = 'SELECT fieldsRight FROM tableRight aliasRight'
 
             if (params.tableBridge) {
                 sql += ' LEFT JOIN tableBridge aliasBridge ON aliasBridge.foreignKeyBridgeRight = aliasRight.foreignKeyRight'
+                if (params.includeJoin) {
+                    for (let i in params.includeJoin) {
+                        sql += ' '+params.includeJoin[i]
+                    }
+                }
                 sql += ' WHERE aliasBridge.foreignKeyBridgeLeft = valueKey'
-                params.aliasBridge  = params.aliasBridge || params.tableBridge.substr(0, 4).capitalize()
             } else {
-                sql += ' WHERE aliasRight.municipio_id = valueKey'
+                if (params.includeJoin) {
+                    for (let i in params.includeJoin) {
+                        sql += ' '+params.includeJoin[i]
+                    }
+                }
+                sql += ' WHERE aliasRight.foreignKeyRight = valueKey'
             }
-
-            params.aliasRight = params.aliasRight  || params.tableRight.substr(0, 4).capitalize()
 
             if (params.fields.constructor.name !== 'String') {
                 let newFieldsRight = ''
@@ -306,7 +314,7 @@ class Finder extends Behavior {
 
                     newFieldsRight += this.getAliasField(field, params.schema[field], params.aliasRight)
                 }
-                params.fields = newFieldsRight
+                params.fields = (newFieldsRight.length>0) ? newFieldsRight : '*'
             }
 
             sql = sql.replace('fieldsRight', params.fields)
@@ -320,7 +328,9 @@ class Finder extends Behavior {
                 .replace('foreignKeyBridgeLeft', params.foreignKeyBridgeLeft)
             sql = sql.replaceAll('aliasBridge', params.aliasBridge)
         } catch (error) {
-            sql = error.message
+            this.error = error.message
+            console.log(this.error)
+            sql = ''
         }
 
         return sql
@@ -345,6 +355,9 @@ class Finder extends Behavior {
                 }
 
                 if (this.associations[assoc].hasOne) {
+                    if (!!!this.associations[assoc].hasOne.table) {
+                        continue
+                    }
                     const assocHasOne           = await getTable(this.associations[assoc].hasOne.table)
                     const propHasOne            = objectClone(this.associations[assoc].hasOne)
                     const newFields             = []
@@ -373,14 +386,38 @@ class Finder extends Behavior {
                 }
 
                 if (this.associations[assoc].hasMany) {
+                    if (!!!this.associations[assoc].hasMany.table) {
+                        continue
+                    }
                     const assocHasMany          = await getTable(this.associations[assoc].hasMany.table)
                     const propHasMany           = objectClone(this.associations[assoc].hasMany)
                     const newFields             = []
+                    const includeJoin           = {sql:[], schema:{}}
 
                     propHasMany.foreignKeyLeft  = propHasMany.foreignKeyLeft    || assocHasMany.primaryKey
                     propHasMany.foreignKeyRight = propHasMany.foreignKeyRight   || assocHasMany.primaryKey
                     propHasMany.tableRight      = propHasMany.tableRight        || assocHasMany.table
+                    propHasMany.aliasRight      = propHasMany.aliasRight        || assocHasMany.alias
                     propHasMany.schema          = assocHasMany.schema
+                    if (propHasMany.tableBridge && !!!propHasMany.aliasBridge) {
+                        propHasMany.aliasBridge = propHasMany.tableBridge.humanize().fourAlias()
+                    }
+
+                    if (propHasMany.includeHasOne) {
+                        for (let i in propHasMany.includeHasOne) {
+                            const assocBridgeName   = propHasMany.includeHasOne[i]
+                            const tableBridgeName   = assocHasMany.associations[assocBridgeName].hasOne.table
+                            const fieldBridgeName   = assocHasMany.associations[assocBridgeName].hasOne.foreignKeyLeft
+                            const assocHasOne       = await getTable(tableBridgeName)
+                            let sqlHasOne           = 'LEFT JOIN '+assocHasOne.table+' '+assocHasOne.alias
+                            sqlHasOne += ' ON '+assocHasOne.alias+'.'+assocHasOne.primaryKey+' = '+assocHasMany.alias+'.'+fieldBridgeName
+                            includeJoin.sql.push(sqlHasOne)
+                            includeJoin.schema[assocBridgeName.fourAlias()] = assocHasOne.schema
+                        }
+                        if (includeJoin.sql.length>0) {
+                            propHasMany.includeJoin = includeJoin.sql
+                        }
+                    }
 
                     if (!!!propHasMany.fields) {
                         propHasMany.fields = []
@@ -388,11 +425,16 @@ class Finder extends Behavior {
                             propHasMany.fields.push(field)
                         }
                     }
-                    for (let l in propHasMany.fields) {
-                        let field   = propHasMany.fields[l]
-                        let type    = assocHasMany.schema[field].type       || 'string'
-                        let hidden  = assocHasMany.schema[field].hidden     || false
-                        hidden      = !!!assocHasMany.schema[field].pk  ? hidden : false
+                    for (let l in propHasMany.fields) { // verifica se os campos podem ser exibidos
+                        const field     = propHasMany.fields[l]
+                        let schema      = assocHasMany.schema[field]    || false
+                        if (!schema && typeof includeJoin.schema !== 'undefined') {
+                            const arrField = field.split('.')
+                            schema = includeJoin.schema[arrField[0]][arrField[1]] || false
+                        }
+
+                        let hidden      = schema.hidden || false
+                        hidden          = !!!schema.pk  ? hidden : false
 
                         if (hidden) {
                             continue
@@ -742,7 +784,6 @@ class Finder extends Behavior {
             if (!noCount) {
                 lista.paging = paginacao
             }
-
             // recuperando as associações do tipo hasMany
             for (let assocHasMany in sqlJoin.hasMany) {
                 for (let loopItens in lista.itens) {

@@ -18,24 +18,47 @@ class Perfis extends Table {
         this.schemaName = 'perfil'
 
         this.associations = {
-            Usuarios: {
+            Aplicacao: {
+                hasOne: {
+                    foreignKeyLeft: 'aplicacao_id',
+                    tableRight: 'aplicacoes',
+                    foreignKeyRight: 'id'
+                }
+            },
+            Rotas: {
                 hasMany: {
-                    table:                      'mac.usuarios', 
-                    tableBridge:                'associacoes', 
-                    foreignKeyBridgeLeft:       'perfil_id', 
-                    foreignKeyBridgeRight:      'usuario_id',
-                    fields:                     ['id', 'nome', 'ativo']
+                    foreignKeyLeft: 'id',
+                    tableBridge: 'permissoes',
+                    foreignKeyBridgeLeft: 'perfil_id', 
+                    foreignKeyBridgeRight: 'rota_id',
+                    tableRight: 'rotas',
+                    foreignKeyRight: 'id'
                 }
             }
         }
 
         this.validations = {
             'nome': {
-                notEmpty: {when: ['create','update'], msg: __('O Campo nome é obrigatório !')},
+                notEmpty: {when: ['create'], msg: __('O Campo nome é obrigatório !')},
                 unique: {msg: __("O nome '{nome}' já foi cadastrado !")}
+            },
+            'aplicacao_id': {
+                notEmpty: {when: ['create'], 'msg': __('O campo %aplicacao_id% é obrigatório!')}
             }
         }
+    }
 
+    /**
+     * Método antes de validar
+     * - força o id da aplicação.
+     *
+     * @param   {Object}    data        Dados do registro.
+     * @return  {Boolean}   boolean     Verdadeiro se deve continuar, Falso se não.
+     */
+    async beforeValidate() {
+        this.data['PerfAplicacaoId'] = configure('codigo_sistema')
+
+        return true
     }
 }
 

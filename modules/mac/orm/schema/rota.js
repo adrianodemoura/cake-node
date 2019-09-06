@@ -26,7 +26,7 @@ class Rota extends Schema {
             index: true,
             comment: 'chave primária'
         }
-        this.schema.caminho = {
+        this.schema.rota = {
             title: __('Rota'),
             type: 'string',
             width: 60,
