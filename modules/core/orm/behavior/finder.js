@@ -237,13 +237,10 @@ class Finder extends Behavior {
         let sql = ''
 
         try {
-            if (!this.alias.length) {
-                throw new Error(__('Alias inválido !'))
-            }
             const alias = this.alias
 
             if (!!!params.tableRight) {
-                throw new Error(__('tabela do lado direito inválida !'))
+                throw new Error(__('Tabela do lado direito inválida!'))
             }
 
             params.join         = params.join || 'LEFT JOIN'
@@ -256,10 +253,13 @@ class Finder extends Behavior {
             sql = params.join
             sql += ' '   + params.tableRight + ' ' + params.aliasRight
             sql += ' ON '+ params.aliasRight + '.' + params.foreignKeyRight
-            sql += ' = ' + alias + '.' + params.foreignKeyLeft
+            sql += ' = ' + this.alias + '.' + params.foreignKeyLeft
 
         } catch (error) {
             sql = error.message
+            if (this.debug) {
+                console.log(error.message)
+            }
         }
 
         return sql
@@ -283,6 +283,7 @@ class Finder extends Behavior {
             }
 
             params.aliasRight = params.aliasRight || params.tableRight.fourAlias().capitalize()
+            params.aliasBridge= params.aliasBridge || params.tableBridge.fourAlias().capitalize()
 
             sql = 'SELECT fieldsRight FROM tableRight aliasRight'
 
@@ -307,11 +308,7 @@ class Finder extends Behavior {
                 let newFieldsRight = ''
                 for(let l in params.fields) {
                     let field = params.fields[l]
-
-                    if (l>0) {
-                        newFieldsRight += ', '
-                    }
-
+                    if (l>0) { newFieldsRight += ', '}
                     newFieldsRight += this.getAliasField(field, params.schema[field], params.aliasRight)
                 }
                 params.fields = (newFieldsRight.length>0) ? newFieldsRight : '*'
@@ -329,129 +326,14 @@ class Finder extends Behavior {
             sql = sql.replaceAll('aliasBridge', params.aliasBridge)
         } catch (error) {
             this.error = error.message
+            if (this.debug) {
+                console.log(this.error)
+            }
             console.log(this.error)
             sql = ''
         }
 
         return sql
-    }
-
-    /**
-     * Retorna a sql join conorme seu tipo. hasOne ou hasMany.
-     * 
-     * @param   {Object}    Parâmetros da associação.
-     * @return  {Object}    Objeto sqlJoin dividio pelo tipo.
-     */
-    async getSqlJoin(associations = {}) {
-        let sqlJoin = {'hasOne': [], 'hasMany': []}
-
-        if (associations && associations.length>0) {
-            for (let loop in associations) {
-                let assoc = associations[loop].capitalize()
-
-                if (!!!this.associations[assoc]) {
-                    this.warnings[assoc] = __('Associação %'+assoc+'% inexistente !')
-                    continue
-                }
-
-                if (this.associations[assoc].hasOne) {
-                    if (!!!this.associations[assoc].hasOne.table) {
-                        continue
-                    }
-                    const assocHasOne           = await getTable(this.associations[assoc].hasOne.table)
-                    const propHasOne            = objectClone(this.associations[assoc].hasOne)
-                    const newFields             = []
-
-                    propHasOne.foreignKeyRight  = propHasOne.foreignKeyRight    || assocHasOne.primaryKey
-                    propHasOne.tableRight       = propHasOne.tableRight         || assocHasOne.table
-
-                    if (!!!propHasOne.fields) {
-                        propHasOne.fields = []
-                        for (let field in assocHasOne.schema) {
-                            propHasOne.fields.push(field)
-                        }
-                    }
-                    for (let l in propHasOne.fields) {
-                        let field   = propHasOne.fields[l]
-                        let hidden  = assocHasOne.schema[field].hidden || false
-                        hidden      = !!!assocHasOne.schema[field].pk ? hidden : false
-
-                        if (!hidden) {
-                            newFields.push(field)
-                        }
-                    }
-                    propHasOne.fields = newFields
-
-                    sqlJoin.hasOne[loop]= this.getSqlHasOne(propHasOne)
-                }
-
-                if (this.associations[assoc].hasMany) {
-                    if (!!!this.associations[assoc].hasMany.table) {
-                        continue
-                    }
-                    const assocHasMany          = await getTable(this.associations[assoc].hasMany.table)
-                    const propHasMany           = objectClone(this.associations[assoc].hasMany)
-                    const newFields             = []
-                    const includeJoin           = {sql:[], schema:{}}
-
-                    propHasMany.foreignKeyLeft  = propHasMany.foreignKeyLeft    || assocHasMany.primaryKey
-                    propHasMany.foreignKeyRight = propHasMany.foreignKeyRight   || assocHasMany.primaryKey
-                    propHasMany.tableRight      = propHasMany.tableRight        || assocHasMany.table
-                    propHasMany.aliasRight      = propHasMany.aliasRight        || assocHasMany.alias
-                    propHasMany.schema          = assocHasMany.schema
-                    if (propHasMany.tableBridge && !!!propHasMany.aliasBridge) {
-                        propHasMany.aliasBridge = propHasMany.tableBridge.humanize().fourAlias()
-                    }
-
-                    if (propHasMany.includeHasOne) {
-                        for (let i in propHasMany.includeHasOne) {
-                            const assocBridgeName   = propHasMany.includeHasOne[i]
-                            const tableBridgeName   = assocHasMany.associations[assocBridgeName].hasOne.table
-                            const fieldBridgeName   = assocHasMany.associations[assocBridgeName].hasOne.foreignKeyLeft
-                            const assocHasOne       = await getTable(tableBridgeName)
-                            let sqlHasOne           = 'LEFT JOIN '+assocHasOne.table+' '+assocHasOne.alias
-                            sqlHasOne += ' ON '+assocHasOne.alias+'.'+assocHasOne.primaryKey+' = '+assocHasMany.alias+'.'+fieldBridgeName
-                            includeJoin.sql.push(sqlHasOne)
-                            includeJoin.schema[assocBridgeName.fourAlias()] = assocHasOne.schema
-                        }
-                        if (includeJoin.sql.length>0) {
-                            propHasMany.includeJoin = includeJoin.sql
-                        }
-                    }
-
-                    if (!!!propHasMany.fields) {
-                        propHasMany.fields = []
-                        for (let field in assocHasMany.schema) {
-                            propHasMany.fields.push(field)
-                        }
-                    }
-                    for (let l in propHasMany.fields) { // verifica se os campos podem ser exibidos
-                        const field     = propHasMany.fields[l]
-                        let schema      = assocHasMany.schema[field]    || false
-                        if (!schema && typeof includeJoin.schema !== 'undefined') {
-                            const arrField = field.split('.')
-                            schema = includeJoin.schema[arrField[0]][arrField[1]] || false
-                        }
-
-                        let hidden      = schema.hidden || false
-                        hidden          = !!!schema.pk  ? hidden : false
-
-                        if (hidden) {
-                            continue
-                        }
-
-                        newFields.push(field)
-
-                    }
-                    propHasMany.fields = newFields
-
-                    sqlJoin.hasMany[assoc] = this.getSqlHasMany(propHasMany)
-                }
-
-            }
-        }
-
-        return sqlJoin
     }
 
 	/**
@@ -562,6 +444,7 @@ class Finder extends Behavior {
             let paginacao   = {}
             let noCount     = false
             let pk          = this.primaryKey
+            let schemaFields= objectClone(this.schema)
 
             // parâmetros obrigatório para a pesquisa
             params.limit        = params.limit          || 10
@@ -620,103 +503,56 @@ class Finder extends Behavior {
                 }
             }
 
-            // não executa o count
+            // sé é lista ou o primeiro, não executa o count
             if (['list','first'].indexOf(params.type) > -1) {
                 noCount = true;
             }
 
-            // verificando a página
-            params.page  = (params.page<1) ? 1 : params.page
-
-            // verifica o limite
-            params.limit = (params.limit>100000) ? 100000 : params.limit
-
             // paginação
+            params.page  = (params.page<1) ? 1 : params.page
+            params.limit = (params.limit>100000) ? 100000 : params.limit
             if (!noCount) {
                 paginacao = {page: parseInt(params.page), count: 0, pageCount: 0, limit: params.limit}
             }
-
-            // se não tem fields
-            if (! params.fields.length ) {
+            if (! params.fields.length ) { // se não foi passado nenhum campo, pega todos da tabela corrente.
                 params.fields = []
-                for (let field in this.schema) { // pegados da table corrente
+                for (let field in this.schema) {
                     params.fields.push(field)
                 }
-
-                // pega todos da associação hasOne
-                for (let loop in params.associations) {
-                    let Association = params.associations[loop].capitalize()
-                    if (this.associations[Association].hasOne) {
-
-                        let moduleRight = this.associations[Association].hasOne.table || ''
-                        if (moduleRight.length) {
-                            let tableHasOne = await getTable(moduleRight)
-                            let fieldsAssoc = this.associations[Association].hasOne.fields || []
-                            if (!!!fieldsAssoc.length) {
-                                for(let field in tableHasOne.schema) {
-                                    fieldsAssoc.push(field)
-                                }
-                            }
-
-                            for (let l in fieldsAssoc) {
-                                let hidden  = tableHasOne.schema[fieldsAssoc[l]].hidden || false
-                                hidden      = tableHasOne.schema[fieldsAssoc[l]].pk ? hidden : false
-                                if (!hidden) {
-                                    params.fields.push(tableHasOne.alias+'.'+fieldsAssoc[l])
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // verifica se os campos estão numa array
-            if ( !Array.isArray(params.fields) ) {
-                throw new Error('04 - '+__('O parâmetro fields não é um array !'))
             }
 
             // configurando as associações
-            let sqlJoin = await this.getSqlJoin(params.associations)
+            const sqlJoin = {'hasOne': [], 'hasMany': []}
+            for (const loop in params.associations) {
+                const assocName = params.associations[loop]
+
+                // recuperando sql hasOne
+                if (this.associations.hasOne[assocName]) {
+                    if (!!! this.associations.hasOne[assocName].fields) {
+                        const schemaHasOne = await this.getSchema(this.associations.hasOne[assocName].tableRight)
+                        for(const fieldHasOne in schemaHasOne.fieldsType) {
+                            schemaFields[schemaHasOne.alias+'.'+fieldHasOne] = schemaHasOne.schema[fieldHasOne]
+                            params.fields.push(schemaHasOne.alias+'.'+fieldHasOne)
+                        }
+                    }
+                    sqlJoin.hasOne.push(this.getSqlHasOne(this.associations.hasOne[assocName]))
+                }
+            }
 
             // renomeando campo a campo
             let newsFields = []
-            for (let loop in params.fields) {
-                let alias       = this.alias
-                let field       = params.fields[loop]
-                if (field.indexOf('.') > -1) {
-                    const arrField  = field.split('.')
-                    alias           = arrField[0].capitalize()
-                    field           = arrField[1].toLowerCase()
-                }
-                const schemaField   = this.schema[field] || {}
+            for (const loop in params.fields) {
+                const alias         = this.alias
+                const field         = params.fields[loop]
+                const schemaField   = schemaFields[field] || {}
 
                 if (!params.fieldHidden) {
                     let hidden = schemaField.hidden || false
                     hidden = !!!schemaField.pk ? hidden : false
-                    if (hidden) {
-                        continue
-                    }
+                    if (hidden) { continue }
                 }
 
-                if (this.schema[field] && alias === this.alias) {
-                    //console.log('achei: '+alias+'.'+field)
-                } else {
-                    let salvo = false
-                    if (sqlJoin.hasOne) {
-                        for(let loopHo in sqlJoin.hasOne) {
-                            if (sqlJoin.hasOne[loopHo].indexOf(' '+alias+' ') > -1) {
-                                salvo = true
-                            }
-                        }
-                    }
-                    if (! salvo) {
-                        throw new Error('05 - '+__('Campo %'+params.fields[loop]+'% inválido!'))
-                    }
-                }
-                
-                let aliasField  = this.getAliasField(field, schemaField, alias)
-
-                newsFields.push(aliasField)
+                newsFields.push(this.getAliasField(field, schemaField, alias))
             }
             params.fields = newsFields
 
@@ -785,15 +621,33 @@ class Finder extends Behavior {
                 lista.paging = paginacao
             }
             // recuperando as associações do tipo hasMany
+            for (const loop in params.associations) {
+                const assocName = params.associations[loop]
+
+                // recuperando sql hasOne
+                if (this.associations.hasMany[assocName]) {
+                    if (!!! this.associations.hasMany[assocName].fields) {
+                        this.associations.hasMany[assocName].fields = []
+                        const schemaHasMany = await this.getSchema(this.associations.hasMany[assocName].tableRight)
+                        for(const fieldHasMany in schemaHasMany.fieldsType) {
+                            this.associations.hasMany[assocName].schema = schemaHasMany.schema
+                            this.associations.hasMany[assocName].fields.push(fieldHasMany)
+                        }
+                    }
+                    sqlJoin.hasMany[assocName] = this.getSqlHasMany(this.associations.hasMany[assocName])
+                }
+            }
             for (let assocHasMany in sqlJoin.hasMany) {
                 for (let loopItens in lista.itens) {
                     let sqlHasMany      = sqlJoin.hasMany[assocHasMany]
                     const fieldLeft     = (this.alias+'_'+this.primaryKey).capitalize().humanize()
                     const valueKey      = lista.itens[loopItens][fieldLeft]
 
-                    sqlHasMany = sqlHasMany.replace('valueKey', valueKey)
-                    let listHasMany = await this.query(sqlHasMany)
-                    lista.itens[loopItens][assocHasMany] = listHasMany
+                    if (sqlHasMany.length>0) {
+                        sqlHasMany = sqlHasMany.replace('valueKey', valueKey)
+                        let listHasMany = await this.query(sqlHasMany)
+                        lista.itens[loopItens][assocHasMany] = listHasMany
+                    }
                 }
             }
 

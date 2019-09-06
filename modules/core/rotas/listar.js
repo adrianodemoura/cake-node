@@ -45,8 +45,10 @@ module.exports = app => {
             paramsFind.where    = (!!!params.filtro) ? {} : params.filtro
             paramsFind.associations = !!!params.associacoes ? [] : params.associacoes.split(',')
             if (! paramsFind.associations.length ) {
-                for (let Association in Table.associations) {
-                    paramsFind.associations.push(Association)
+                for (let typeAssociation in Table.associations) {
+                    for (const Association in Table.associations[typeAssociation]) {
+                        paramsFind.associations.push(Association)
+                    }
                 }
             }
 

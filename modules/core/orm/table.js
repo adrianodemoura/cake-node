@@ -80,10 +80,30 @@ class Table {
      * @param   {String}    table   Nome da tabela.
      * @return  {Object}    schema  Schema da table.
      */
-    getSchema(table='') {
+    async getSchema(table='') {
         const Cache             = require (CORE + '/lib/cache.js')
         const schemaCacheName   = table.length>0 ? 'schema_'+table.toLowerCase() : 'schema_'+this.table
         let schema              = Cache.read(schemaCacheName)
+        if (!!!schema.alias) {
+            for (const assocName in this.associations.hasOne) {
+                const tableRight = this.associations.hasOne[assocName].tableRight
+                if (tableRight === table) {
+                    const moduleName = this.associations.hasOne[assocName].module
+                    await getTable(moduleName+'.'+table)
+                    schema = Cache.read(schemaCacheName)
+                }
+            }
+        }
+        if (!!!schema.alias) {
+            for (const assocName in this.associations.hasMany) {
+                const tableRight = this.associations.hasMany[assocName].tableRight
+                if (tableRight === table) {
+                    const moduleName = this.associations.hasMany[assocName].module
+                    await getTable(moduleName+'.'+table)
+                    schema = Cache.read(schemaCacheName)
+                }
+            }
+        }
 
         return schema
     }
@@ -93,7 +113,7 @@ class Table {
      *
      * @return    {Object}    info  Informações da tabela.
      */
-   info() {
+    info() {
       let info          = {}
 
       info.table        = this.table
@@ -101,7 +121,7 @@ class Table {
       info.module       = this.module
 
       return info
-   }
+    }
 
     /**
      * inclui um behavior
@@ -159,7 +179,7 @@ class Table {
      * 
      * @return  {void}
      */
-    async setSchema() {
+    async setSchema(table='') {
 
         await this.init()
         this.alias              = this.table.humanize().fourAlias()

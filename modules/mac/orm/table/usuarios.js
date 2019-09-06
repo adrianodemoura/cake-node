@@ -19,36 +19,35 @@ class Usuarios extends Table {
 
         // associações
         this.associations = {
-            Municipio: {
-                hasOne: {
+            hasOne: {
+                Municipio: {
+                    module: 'mac',
                     foreignKeyLeft: 'municipio_id',
                     tableRight: 'municipios',
                     foreignKeyRight: 'id'
                 }
             },
-            Perfis: {
-                hasMany: {
+            hasMany: {
+                Perfis: {
+                    module: 'mac',
                     foreignKeyLeft: 'id',
                     tableBridge: 'papeis',
                     foreignKeyBridgeLeft: 'usuario_id', 
                     foreignKeyBridgeRight: 'perfil_id',
                     tableRight: 'perfis',
                     foreignKeyRight: 'id',
-
-                }
-            },
-            Unidades: {
-                hasMany: {
+                },
+                Unidades: {
+                    module: 'mac',
                     foreignKeyLeft: 'id',
                     tableBridge: 'papeis',
                     foreignKeyBridgeLeft: 'usuario_id', 
                     foreignKeyBridgeRight: 'unidade_id',
-                    tableRight: 'perfis',
+                    tableRight: 'unidades',
                     foreignKeyRight: 'id'
-                }
-            },
-            Aplicacoes: {
-                hasMany: { 
+                },
+                Aplicacoes: {
+                    module: 'mac',
                     foreignKeyLeft: 'id',
                     tableBridge: 'papeis',
                     foreignKeyBridgeLeft: 'usuario_id', 

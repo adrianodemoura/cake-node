@@ -18,8 +18,8 @@ class Municipios extends Table {
         this.schemaName = 'municipio'
 
         this.associations = {
-            Usuarios: {
-                hasMany: {
+            hasMany: {
+                Usuarios: {
                     foreignKeyLeft: 'id',
                     tableRight: 'usuarios',
                     foreignKeyRight: 'municipio_id'

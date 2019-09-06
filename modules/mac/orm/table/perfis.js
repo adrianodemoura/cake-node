@@ -18,15 +18,15 @@ class Perfis extends Table {
         this.schemaName = 'perfil'
 
         this.associations = {
-            Aplicacao: {
-                hasOne: {
+            hasOne: {
+                Aplicacao: {
                     foreignKeyLeft: 'aplicacao_id',
                     tableRight: 'aplicacoes',
                     foreignKeyRight: 'id'
                 }
             },
-            Rotas: {
-                hasMany: {
+            hasMany: {
+                Rotas: {
                     foreignKeyLeft: 'id',
                     tableBridge: 'permissoes',
                     foreignKeyBridgeLeft: 'perfil_id', 

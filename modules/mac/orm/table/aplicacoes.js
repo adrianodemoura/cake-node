@@ -19,15 +19,13 @@ class Aplicacoes extends Table {
 
         // associações
         this.associations = {
-            Rotas: {
-                hasMany: {
+            hasMany: {
+                Rotas: {
                     foreignKeyLeft:         'id',
                     tableRight:             'rotas',
                     foreignKeyRight:        'aplicacao_id'
-                }
-            },
-            Perfis: {
-                hasMany: {
+                },
+                Perfis: {
                     foreignKeyLeft:         'id',
                     tableRight:             'perfis',
                     foreignKeyRight:        'aplicacao_id'

@@ -18,15 +18,15 @@ class Rotas extends Table {
         this.schemaName = 'rota'
 
         this.associations = {
-            Aplicacoes: {
-                hasOne: {
+            hasOne: {
+                Aplicacoes: {
                     foreignKeyLeft: 'aplicacao_id',
                     tableRight: 'aplicacoes',
                     foreignKeyRight: 'id'
                 }
             },
-            Perfis: {
-                hasMany: {
+            hasMany: {
+                Perfis: {
                     foreignKeyLeft: 'id',
                     tableBridge: 'permissoes', 
                     foreignKeyBridgeLeft: 'rota_id', 
