@@ -34,6 +34,7 @@ class Perfis extends Table {
                 hasMany: { 
                     tableBridge: 'perfis_rotas',
                     foreignKeyBridgeLeft: 'perfil_id', 
+                    tableRight: 'perfis',
                     foreignKeyBridgeRight: 'rota_id'
                 }
             }

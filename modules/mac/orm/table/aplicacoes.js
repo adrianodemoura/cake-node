@@ -20,10 +20,13 @@ class Aplicacoes extends Table {
         // associações
         this.associations = {
             Rotas: {
-                hasMany: { 
+                hasMany: {
+                    foreignKeyLeft:         'id',
                     tableBridge:            'aplicacoes_rotas', 
                     foreignKeyBridgeLeft:   'aplicacao_id', 
-                    foreignKeyBridgeRight:  'rota_id'
+                    foreignKeyBridgeRight:  'rota_id',
+                    foreignKeyRight:        'id',
+                    tableRight:             'rotas'
                 }
             }
         }

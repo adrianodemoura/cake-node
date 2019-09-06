@@ -753,11 +753,14 @@ class Crud extends Behavior {
                 }
             }
 
+            // criando tabelas hasOne
             for(let Assoc in params.associations) {
                 if (!!! params.associations[Assoc].hasOne) {
                     continue
                 }
-                const assocHasOne = await getTable(params.associations[Assoc].hasOne.table)
+                if (!!! params.associations[Assoc].hasOne.tableRight) {
+                    throw new Error(__('O Parâmetro tableRight não foi informado na associação hasOne de '+Assoc+' de '+this.table))
+                }
 
                 if (!!! params.associations[Assoc].hasOne.tableRight ) {
                     params.associations[Assoc].hasOne.tableRight = assocHasOne.table
@@ -780,30 +783,23 @@ class Crud extends Behavior {
             let fieldLeft       = ''
             let fieldRight      = ''
 
+            // criando tabelas hasOne
             for(let Assoc in params.associations) {
                 if (!!!params.associations[Assoc].hasMany) {
                     continue
                 }
-                if (!!!this.associations[Assoc].hasMany.table) {
-                    continue
+                if (!!! params.associations[Assoc].hasMany.tableRight) {
+                    throw new Error(__('O Parâmetro tableRight não foi informado nnnnnna associação '+Assoc+' de '+this.name))
+                }
+                if (!!! params.associations[Assoc].hasMany.foreignKeyRight) {
+                    throw new Error(__('O Parâmetro foreignKeyRight não foi informado na associação '+Assoc+' de '+this.name))
+                }
+                if (!!! params.associations[Assoc].hasMany.foreignKeyLeft) {
+                    throw new Error(__('O Parâmetro foreignKeyLeft não foi informado na associação '+Assoc+' de '+this.name))
                 }
 
-                const assocHasMany = await getTable(this.associations[Assoc].hasMany.table)
-
-                if (!!! params.associations[Assoc].hasMany.tableRight ) {
-                    params.associations[Assoc].hasMany.tableRight = assocHasMany.table
-                }
-                if (!!! params.associations[Assoc].hasMany.foreignKeyLeft ) {
-                    params.associations[Assoc].hasMany.foreignKeyLeft = this.primaryKey
-                }
-                if (!!! params.associations[Assoc].hasMany.foreignKeyRight ) {
-                    params.associations[Assoc].hasMany.foreignKeyRight = assocHasMany.primaryKey
-                }
-
-                tableBridge = params.associations[Assoc].hasMany.tableBridge
+                const tableBridge = params.associations[Assoc].hasMany.tableBridge
                 paramsHasmany['table'] = tableBridge
-
-                tableRight  = params.associations[Assoc].hasMany.tableRight
                 fieldLeft   = params.associations[Assoc].hasMany.foreignKeyBridgeRight
                 fieldRight  = params.associations[Assoc].hasMany.foreignKeyBridgeRight
                 fieldBridge = params.associations[Assoc].hasMany.foreignKeyBridgeLeft
@@ -878,6 +874,9 @@ class Crud extends Behavior {
             return true
         } catch (e) {
             this.error = e.message
+            if (this.debug) {
+                console.log(this.error)
+            }
             return false
         }
     }
