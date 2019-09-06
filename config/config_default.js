@@ -9,7 +9,7 @@
  * Mantém as configurações da API
  */
 module.exports = {
-  "language": "en",
+  "language": "ptBR",
   "versao": "0.7",
   "sistema": "cakeNode",
   "codigo_sistema": 0,

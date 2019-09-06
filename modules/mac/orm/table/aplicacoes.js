@@ -22,11 +22,15 @@ class Aplicacoes extends Table {
             Rotas: {
                 hasMany: {
                     foreignKeyLeft:         'id',
-                    tableBridge:            'aplicacoes_rotas', 
-                    foreignKeyBridgeLeft:   'aplicacao_id', 
-                    foreignKeyBridgeRight:  'rota_id',
-                    foreignKeyRight:        'id',
-                    tableRight:             'rotas'
+                    tableRight:             'rotas',
+                    foreignKeyRight:        'aplicacao_id'
+                }
+            },
+            Perfis: {
+                hasMany: {
+                    foreignKeyLeft:         'id',
+                    tableRight:             'perfis',
+                    foreignKeyRight:        'aplicacao_id'
                 }
             }
         }

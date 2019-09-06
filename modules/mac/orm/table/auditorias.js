@@ -21,7 +21,9 @@ class Auditorias extends Table {
         this.associations = {
             Usuarios: {
                 hasOne: {
-                    foreignKeyLeft: 'usuario_id'
+                    foreignKeyLeft: 'usuario_id',
+                    tableRight: 'usuarios',
+                    foreignKeyRight: 'id'
                 }
             }
         }

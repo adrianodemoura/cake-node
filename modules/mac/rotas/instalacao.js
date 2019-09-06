@@ -82,10 +82,10 @@ module.exports = app => {
 
             // excluindo tudo antes
             if (dropAll && configEnv.debug) {
-                if (! await conexao.query("DROP TABLE IF EXISTS vinculacoes") ) {
+                if (! await conexao.query("DROP TABLE IF EXISTS papeis") ) {
                     throw new Error('07 - '+__('Erro ao tentar excluir a tablela %vinculacoes%!'))
                 }
-                if (! await conexao.query("DROP TABLE IF EXISTS perfis_rotas") ) {
+                if (! await conexao.query("DROP TABLE IF EXISTS permissoes") ) {
                     throw new Error('08 - '+__('Erro ao tentar excluira a tablela %perfis_rotas%!'))
                 }
                 if (! await conexao.query("DROP TABLE IF EXISTS rotas") ) {

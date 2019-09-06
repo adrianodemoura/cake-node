@@ -20,6 +20,7 @@ class Municipios extends Table {
         this.associations = {
             Usuarios: {
                 hasMany: {
+                    foreignKeyLeft: 'id',
                     tableRight: 'usuarios',
                     foreignKeyRight: 'municipio_id'
                 }

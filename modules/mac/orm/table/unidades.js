@@ -21,21 +21,30 @@ class Unidades extends Table {
         this.associations = {
             Aplicacoes: {
                 hasMany: {
-                    tableBridge: 'vinculacoes',
+                    foreignKeyLeft: 'id',
+                    tableRight: 'aplicacoes',
+                    foreignKeyRight: 'id',
+                    tableBridge: 'papeis',
                     foreignKeyBridgeLeft: 'unidade_id', 
                     foreignKeyBridgeRight: 'aplicacao_id'
                 }
             },
             Perfis: {
                 hasMany: { 
-                    tableBridge: 'vinculacoes',
+                    foreignKeyLeft: 'id',
+                    tableRight: 'perfis',
+                    foreignKeyRight: 'id',
+                    tableBridge: 'papeis',
                     foreignKeyBridgeLeft: 'unidade_id', 
                     foreignKeyBridgeRight: 'perfil_id'
                 }
             },
             Usuarios: {
                 hasMany: { 
-                    tableBridge: 'vinculacoes',
+                    foreignKeyLeft: 'id',
+                    tableRight: 'usuarios',
+                    foreignKeyRight: 'id',
+                    tableBridge: 'papeis',
                     foreignKeyBridgeLeft: 'unidade_id', 
                     foreignKeyBridgeRight: 'usuario_id'
                 }

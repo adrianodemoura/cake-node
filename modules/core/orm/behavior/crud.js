@@ -759,14 +759,11 @@ class Crud extends Behavior {
                     continue
                 }
                 if (!!! params.associations[Assoc].hasOne.tableRight) {
-                    throw new Error(__('O Parâmetro tableRight não foi informado na associação hasOne de '+Assoc+' de '+this.table))
+                    throw new Error(__('O Parâmetro tableRight não foi informado na associação hasOne de '+this.name+'.'+Assoc))
                 }
 
-                if (!!! params.associations[Assoc].hasOne.tableRight ) {
-                    params.associations[Assoc].hasOne.tableRight = assocHasOne.table
-                }
                 if (!!! params.associations[Assoc].hasOne.foreignKeyRight ) {
-                    params.associations[Assoc].hasOne.foreignKeyRight = assocHasOne.primaryKey
+                    throw new Error(__('O Parâmetro foreignKeyRight não foi informado na associação hasOne de '+this.name+'.'+Assoc))
                 }
             }
 
@@ -789,22 +786,27 @@ class Crud extends Behavior {
                     continue
                 }
                 if (!!! params.associations[Assoc].hasMany.tableRight) {
-                    throw new Error(__('O Parâmetro tableRight não foi informado nnnnnna associação '+Assoc+' de '+this.name))
+                    throw new Error(__('O Parâmetro tableRight não foi informado na associação hasMany '+this.name+'.'+Assoc))
                 }
                 if (!!! params.associations[Assoc].hasMany.foreignKeyRight) {
-                    throw new Error(__('O Parâmetro foreignKeyRight não foi informado na associação '+Assoc+' de '+this.name))
+                    throw new Error(__('O Parâmetro foreignKeyRight não foi informado na associação hasMany '+this.name+'.'+Assoc))
                 }
                 if (!!! params.associations[Assoc].hasMany.foreignKeyLeft) {
-                    throw new Error(__('O Parâmetro foreignKeyLeft não foi informado na associação '+Assoc+' de '+this.name))
+                    throw new Error(__('O Parâmetro foreignKeyLeft não foi informado na associação hasMany '+this.name+'.'+Assoc))
                 }
 
                 const tableBridge = params.associations[Assoc].hasMany.tableBridge
                 paramsHasmany['table'] = tableBridge
+
+                tableRight  = params.associations[Assoc].hasMany.tableRight
                 fieldLeft   = params.associations[Assoc].hasMany.foreignKeyBridgeRight
                 fieldRight  = params.associations[Assoc].hasMany.foreignKeyBridgeRight
                 fieldBridge = params.associations[Assoc].hasMany.foreignKeyBridgeLeft
 
                 if (allTables.indexOf(tableRight) < 0) {
+                    if (this.debug) {
+                        console.log(__('A tabela %'+tableRight+'% já foi instalada!'))
+                    }
                     continue
                 }
 
@@ -830,7 +832,6 @@ class Crud extends Behavior {
                 paramsHasmany.associations[Assoc]['hasOne']['foreignKeyLeft'] = fieldLeft
                 paramsHasmany.associations[Assoc]['hasOne']['foreignKeyRight']= params.associations[Assoc].hasMany.foreignKeyRight || 'id'
                 paramsHasmany.associations[Assoc]['hasOne']['tableRight']     = tableRight
-
             }
 
             if (Object.keys(paramsHasmany.fields).length) {
