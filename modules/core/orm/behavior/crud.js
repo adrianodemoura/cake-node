@@ -402,10 +402,10 @@ class Crud extends Behavior {
 
             // montando cada sql INSERT
             for(let Association in dataAssociation) {
-                if (!!!this.associations[Association]) {
+                if (!!!this.associations.hasMany[Association]) {
                     continue
                 }
-                const paramsAssociation = this.associations[Association].hasMany
+                const paramsAssociation = this.associations.hasMany[Association]
                 if (!!!paramsAssociation.tableBridge) {
                     continue
                 }
@@ -803,7 +803,7 @@ class Crud extends Behavior {
 
                 if (allTables.indexOf(tableRight) < 0) {
                     if (this.debug) {
-                        console.log(__('A tabela %'+tableRight+'% já foi instalada!'))
+                        //console.log(__('A tabela %'+tableRight+'% já foi instalada!'))
                     }
                     continue
                 }

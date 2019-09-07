@@ -449,7 +449,7 @@ class Finder extends Behavior {
             // parâmetros obrigatório para a pesquisa
             params.limit        = params.limit          || 10
             params.page         = params.page           || 1
-            params.fieldHidden  = params.fieldHidden    || 0
+            params.fieldHidden  = params.fieldHidden    || false
             params.type         = params.type           || 'all'
             params.fields       = params.fields         || []
             params.associations = params.associations   || []
@@ -546,10 +546,12 @@ class Finder extends Behavior {
                 const field         = params.fields[loop]
                 const schemaField   = schemaFields[field] || {}
 
-                if (!params.fieldHidden) {
+                if (params.fieldHidden === false) {
                     let hidden = schemaField.hidden || false
                     hidden = !!!schemaField.pk ? hidden : false
-                    if (hidden) { continue }
+                    if (hidden) {
+                        continue
+                    }
                 }
 
                 newsFields.push(this.getAliasField(field, schemaField, alias))
