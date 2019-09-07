@@ -356,6 +356,21 @@ class db {
             }
         }
 
+        if (params.associations) {
+            for(let Assoc in params.associations.hasOne) {
+
+                if (params.associations.hasOne[Assoc]) { // hasOne (1:1)
+                    let field           = params.associations.hasOne[Assoc].foreignKeyLeft  || '{foreignKeyLeft}'
+                    let tableRight      = params.associations.hasOne[Assoc].tableRight      || '{tableRight}'
+                    let foreignKeyRight = params.associations.hasOne[Assoc].foreignKeyRight || '{foreignKeyRight}'
+                    let nameConstraint  = params.table.toLowerCase()+'_'+tableRight.toLowerCase()+'_'+field.toLowerCase()
+
+                    indices += ', KEY i_'+params.table.toLowerCase()+'_'+field.toLowerCase()+' ('+field.toLowerCase()+')'
+                    indices += ", CONSTRAINT "+nameConstraint+" FOREIGN KEY ("+field+") REFERENCES "+tableRight+" ("+foreignKeyRight+") ON DELETE CASCADE ON UPDATE CASCADE"
+                }
+            }
+        }
+
         sqlCreate = sqlCreate.replace('{table}', params.table)
         sqlCreate = sqlCreate.replace('{fields}', fields)
         sqlCreate = sqlCreate.replace('{indices}', indices)

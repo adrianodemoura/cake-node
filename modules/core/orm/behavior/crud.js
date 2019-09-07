@@ -382,14 +382,12 @@ class Crud extends Behavior {
      */
     async saveAssociation(vlrId=0) {
         let dataAssociation = {}
-        for (let Association in this.associations) {
-            if (this.associations[Association].hasMany) {
-                if (this.data[Association]) {
-                    if (this.data[Association].constructor.name === 'String') {
-                        dataAssociation[Association] = this.data[Association].replace(/[\[\]]/g,'').replace(/[\(\)]/g,'').split(',')
-                    } else {
-                        dataAssociation[Association] = this.data[Association]
-                    }
+        for (let Association in this.associations.hasMany) {
+            if (this.data[Association]) {
+                if (this.data[Association].constructor.name === 'String') {
+                    dataAssociation[Association] = this.data[Association].replace(/[\[\]]/g,'').replace(/[\(\)]/g,'').split(',')
+                } else {
+                    dataAssociation[Association] = this.data[Association]
                 }
             }
         }
@@ -753,16 +751,16 @@ class Crud extends Behavior {
                 }
             }
 
-            // criando tabelas hasOne
-            for(let Assoc in params.associations) {
-                if (!!! params.associations[Assoc].hasOne) {
+            // criando tabelas e recuperando configuração hasOne
+            for(let Assoc in params.associations.hasOne) {
+                if (!!! params.associations.hasOne[Assoc]) {
                     continue
                 }
-                if (!!! params.associations[Assoc].hasOne.tableRight) {
+                if (!!! params.associations.hasOne[Assoc].tableRight) {
                     throw new Error(__('O Parâmetro tableRight não foi informado na associação hasOne de '+this.name+'.'+Assoc))
                 }
 
-                if (!!! params.associations[Assoc].hasOne.foreignKeyRight ) {
+                if (!!! params.associations.hasOne[Assoc].foreignKeyRight ) {
                     throw new Error(__('O Parâmetro foreignKeyRight não foi informado na associação hasOne de '+this.name+'.'+Assoc))
                 }
             }
@@ -781,27 +779,27 @@ class Crud extends Behavior {
             let fieldRight      = ''
 
             // criando tabelas hasOne
-            for(let Assoc in params.associations) {
-                if (!!!params.associations[Assoc].hasMany) {
+            for(let Assoc in params.associations.hasMany) {
+                if (!!!params.associations.hasMany[Assoc]) {
                     continue
                 }
-                if (!!! params.associations[Assoc].hasMany.tableRight) {
+                if (!!! params.associations.hasMany[Assoc].tableRight) {
                     throw new Error(__('O Parâmetro tableRight não foi informado na associação hasMany '+this.name+'.'+Assoc))
                 }
-                if (!!! params.associations[Assoc].hasMany.foreignKeyRight) {
+                if (!!! params.associations.hasMany[Assoc].foreignKeyRight) {
                     throw new Error(__('O Parâmetro foreignKeyRight não foi informado na associação hasMany '+this.name+'.'+Assoc))
                 }
-                if (!!! params.associations[Assoc].hasMany.foreignKeyLeft) {
+                if (!!! params.associations.hasMany[Assoc].foreignKeyLeft) {
                     throw new Error(__('O Parâmetro foreignKeyLeft não foi informado na associação hasMany '+this.name+'.'+Assoc))
                 }
 
-                const tableBridge = params.associations[Assoc].hasMany.tableBridge
+                const tableBridge = params.associations.hasMany[Assoc].tableBridge
                 paramsHasmany['table'] = tableBridge
 
-                tableRight  = params.associations[Assoc].hasMany.tableRight
-                fieldLeft   = params.associations[Assoc].hasMany.foreignKeyBridgeRight
-                fieldRight  = params.associations[Assoc].hasMany.foreignKeyBridgeRight
-                fieldBridge = params.associations[Assoc].hasMany.foreignKeyBridgeLeft
+                tableRight  = params.associations.hasMany[Assoc].tableRight
+                fieldLeft   = params.associations.hasMany[Assoc].foreignKeyBridgeRight
+                fieldRight  = params.associations.hasMany[Assoc].foreignKeyBridgeRight
+                fieldBridge = params.associations.hasMany[Assoc].foreignKeyBridgeLeft
 
                 if (allTables.indexOf(tableRight) < 0) {
                     if (this.debug) {
@@ -830,7 +828,7 @@ class Crud extends Behavior {
                     paramsHasmany.associations[Assoc] = {'hasOne': {'foreignKeyLeft':'', 'foreignKeyRight':'', 'tableRight':''}}
                 }
                 paramsHasmany.associations[Assoc]['hasOne']['foreignKeyLeft'] = fieldLeft
-                paramsHasmany.associations[Assoc]['hasOne']['foreignKeyRight']= params.associations[Assoc].hasMany.foreignKeyRight || 'id'
+                paramsHasmany.associations[Assoc]['hasOne']['foreignKeyRight']= params.associations.hasMany[Assoc].foreignKeyRight || 'id'
                 paramsHasmany.associations[Assoc]['hasOne']['tableRight']     = tableRight
             }
 
