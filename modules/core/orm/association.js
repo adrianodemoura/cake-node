@@ -17,8 +17,8 @@ class Association {
     constructor() {
         this.hasOne:  {
         	
-        	// nome do módulo, exemplo: mac.usuarios
-        	table: '',
+        	// nome do módulo, exemplo: mac
+        	module: '',
 
         	// nome do campo que vai ligar com a tabela da esquerda
         	foreignKeyLeft: 'id',
@@ -33,8 +33,8 @@ class Association {
         	fields: []
         },
         this.hasMany: {
-        	// nom çadastro que vai fazer a ligação do lado direito, exemplo: mac.perfis
-        	table: '', 
+        	// // nome do módulo, exemplo: mac
+        	module: '', 
 
         	// nome do campo que vai ligar a tabela da esquerda
         	foreignKeyLeft: 'id', 

@@ -21,28 +21,31 @@ class Unidades extends Table {
         this.associations = {
             hasMany: {
                 Aplicacoes: {
-                    foreignKeyLeft: 'id',
-                    tableRight: 'aplicacoes',
-                    foreignKeyRight: 'id',
-                    tableBridge: 'papeis',
-                    foreignKeyBridgeLeft: 'unidade_id', 
-                    foreignKeyBridgeRight: 'aplicacao_id'
+                    module:                 'mac',
+                    foreignKeyLeft:         'id',
+                    tableRight:             'aplicacoes',
+                    foreignKeyRight:        'id',
+                    tableBridge:            'papeis',
+                    foreignKeyBridgeLeft:   'unidade_id', 
+                    foreignKeyBridgeRight:  'aplicacao_id'
                 },
                 Perfis: { 
-                    foreignKeyLeft: 'id',
-                    tableRight: 'perfis',
-                    foreignKeyRight: 'id',
-                    tableBridge: 'papeis',
-                    foreignKeyBridgeLeft: 'unidade_id', 
-                    foreignKeyBridgeRight: 'perfil_id'
+                    module:                 'mac',
+                    foreignKeyLeft:         'id',
+                    tableRight:             'perfis',
+                    foreignKeyRight:        'id',
+                    tableBridge:            'papeis',
+                    foreignKeyBridgeLeft:   'unidade_id', 
+                    foreignKeyBridgeRight:  'perfil_id'
                 },
                 Usuarios: { 
-                    foreignKeyLeft: 'id',
-                    tableRight: 'usuarios',
-                    foreignKeyRight: 'id',
-                    tableBridge: 'papeis',
-                    foreignKeyBridgeLeft: 'unidade_id', 
-                    foreignKeyBridgeRight: 'usuario_id'
+                    module:                 'mac',
+                    foreignKeyLeft:         'id',
+                    tableRight:             'usuarios',
+                    foreignKeyRight:        'id',
+                    tableBridge:            'papeis',
+                    foreignKeyBridgeLeft:   'unidade_id', 
+                    foreignKeyBridgeRight:  'usuario_id'
                 }
             }
         }

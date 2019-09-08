@@ -21,39 +21,45 @@ class Usuarios extends Table {
         this.associations = {
             hasOne: {
                 Municipio: {
-                    module: 'mac',
-                    foreignKeyLeft: 'municipio_id',
-                    tableRight: 'municipios',
-                    foreignKeyRight: 'id'
+                    module:                 'mac',
+                    foreignKeyLeft:         'municipio_id',
+                    tableRight:             'municipios',
+                    foreignKeyRight:        'id'
                 }
             },
             hasMany: {
+                Papeis: {
+                    module:                 'mac',
+                    foreignKeyLeft:         'id',
+                    tableRight:             'papeis',
+                    foreignKeyRight:        'usuario_id'
+                },
                 Perfis: {
-                    module: 'mac',
-                    foreignKeyLeft: 'id',
-                    tableBridge: 'papeis',
-                    foreignKeyBridgeLeft: 'usuario_id', 
-                    foreignKeyBridgeRight: 'perfil_id',
-                    tableRight: 'perfis',
-                    foreignKeyRight: 'id',
+                    module:                 'mac',
+                    foreignKeyLeft:         'id',
+                    tableBridge:            'papeis',
+                    foreignKeyBridgeLeft:   'usuario_id', 
+                    foreignKeyBridgeRight:  'perfil_id',
+                    tableRight:             'perfis',
+                    foreignKeyRight:        'id',
                 },
                 Unidades: {
-                    module: 'mac',
-                    foreignKeyLeft: 'id',
-                    tableBridge: 'papeis',
-                    foreignKeyBridgeLeft: 'usuario_id', 
-                    foreignKeyBridgeRight: 'unidade_id',
-                    tableRight: 'unidades',
-                    foreignKeyRight: 'id'
+                    module:                 'mac',
+                    foreignKeyLeft:         'id',
+                    tableBridge:            'papeis',
+                    foreignKeyBridgeLeft:   'usuario_id', 
+                    foreignKeyBridgeRight:  'unidade_id',
+                    tableRight:             'unidades',
+                    foreignKeyRight:        'id'
                 },
                 Aplicacoes: {
-                    module: 'mac',
-                    foreignKeyLeft: 'id',
-                    tableBridge: 'papeis',
-                    foreignKeyBridgeLeft: 'usuario_id', 
-                    foreignKeyBridgeRight: 'aplicacao_id',
-                    tableRight: 'aplicacoes',
-                    foreignKeyRight: 'id'
+                    module:                 'mac',
+                    foreignKeyLeft:         'id',
+                    tableBridge:            'papeis',
+                    foreignKeyBridgeLeft:   'usuario_id', 
+                    foreignKeyBridgeRight:  'aplicacao_id',
+                    tableRight:             'aplicacoes',
+                    foreignKeyRight:        'id'
                 }
             }
         }

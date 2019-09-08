@@ -105,7 +105,7 @@ class Table {
             }
         }
 
-        return schema
+        return (schema === {} ) ? schema : false
     }
 
     /**

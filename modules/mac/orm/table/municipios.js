@@ -20,9 +20,10 @@ class Municipios extends Table {
         this.associations = {
             hasMany: {
                 Usuarios: {
-                    foreignKeyLeft: 'id',
-                    tableRight: 'usuarios',
-                    foreignKeyRight: 'municipio_id'
+                    module:             'mac',
+                    foreignKeyLeft:     'id',
+                    tableRight:         'usuarios',
+                    foreignKeyRight:    'municipio_id'
                 }
             }
         }

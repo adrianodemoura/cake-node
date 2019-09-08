@@ -631,6 +631,9 @@ class Finder extends Behavior {
                     if (!!! this.associations.hasMany[assocName].fields) {
                         this.associations.hasMany[assocName].fields = []
                         const schemaHasMany = await this.getSchema(this.associations.hasMany[assocName].tableRight)
+                        if (!schemaHasMany) {
+                            throw new Error(__('Não foi possível recuperar o schema de '+assocName))
+                        }
                         for(const fieldHasMany in schemaHasMany.fieldsType) {
                             this.associations.hasMany[assocName].schema = schemaHasMany.schema
                             this.associations.hasMany[assocName].fields.push(fieldHasMany)
