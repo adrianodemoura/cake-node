@@ -144,7 +144,9 @@ class Finder extends Behavior {
                 field       = arrField[1].trim()
             }
             if (!!!this.schema[field]) {
-                field = field.replace(this.alias,'').toLowerCase()
+                field = field.replace(this.alias,'')
+                field = field.replace(/([A-Z])/g, '_'+' $1').replace(/\ /g,'').replace('_','')
+                field = field.toLowerCase()
             }
 
             if (!!!this.schema[field]) {
@@ -282,12 +284,12 @@ class Finder extends Behavior {
                 throw new Error(__('Campos do lado direito inválidos!'))
             }
 
-            params.aliasRight = params.aliasRight || params.tableRight.substr(0,4).capitalize()
-            params.aliasBridge= params.aliasBridge || params.tableBridge.substr(0,4).capitalize()
+            params.aliasRight = params.aliasRight || params.tableRight.humanize().fourAlias()
 
             sql = 'SELECT fieldsRight FROM tableRight aliasRight'
 
             if (params.tableBridge) {
+                params.aliasBridge = params.aliasBridge || params.tableBridge.humanize().fourAlias()
                 sql += ' LEFT JOIN tableBridge aliasBridge ON aliasBridge.foreignKeyBridgeRight = aliasRight.foreignKeyRight'
                 if (params.includeJoin) {
                     for (let i in params.includeJoin) {
@@ -329,7 +331,6 @@ class Finder extends Behavior {
             if (this.debug) {
                 console.log(this.error)
             }
-            console.log(this.error)
             sql = ''
         }
 
@@ -479,6 +480,9 @@ class Finder extends Behavior {
             if (typeof params.where === 'string') {
                 params.where = this.getJsonSqlWhere(params.where)
                 if (params.where === false) {
+                    if (this.debug) {
+                        console.log(params.where)
+                    }
                     throw new Error('04 - '+this.error)
                 }
             }
@@ -651,7 +655,8 @@ class Finder extends Behavior {
             for (let assocHasMany in sqlJoin.hasMany) {
                 for (let loopItens in lista.itens) {
                     let sqlHasMany      = sqlJoin.hasMany[assocHasMany]
-                    const fieldLeft     = (this.alias+'_'+this.primaryKey).capitalize().humanize()
+                    const nameFieldLeft = this.associations.hasMany[assocHasMany].foreignKeyLeft
+                    const fieldLeft     = (this.alias+'_'+nameFieldLeft).capitalize().humanize()
                     const valueKey      = lista.itens[loopItens][fieldLeft]
 
                     if (sqlHasMany.length>0) {
