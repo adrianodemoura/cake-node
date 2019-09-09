@@ -23,7 +23,8 @@ class Papeis extends Table {
                     module:                 'mac',
                     foreignKeyLeft:         'usuario_id',
                     tableRight:             'usuarios',
-                    foreignKeyRight:        'id'
+                    foreignKeyRight:        'id',
+                    fields:                 ['id', 'nome', 'email']
                 },
                 Perfis: {
                     module:                 'mac',

@@ -283,6 +283,9 @@ class Finder extends Behavior {
             if (!!!params.fields) {
                 throw new Error(__('Campos do lado direito inválidos!'))
             }
+            if (!!!params.schema) {
+                throw new Error(__('Esquema inválido!'))
+            }
 
             params.aliasRight = params.aliasRight || params.tableRight.humanize().fourAlias()
 
@@ -306,15 +309,19 @@ class Finder extends Behavior {
                 sql += ' WHERE aliasRight.foreignKeyRight = valueKey'
             }
 
-            if (params.fields.constructor.name !== 'String') {
-                let newFieldsRight = ''
-                for(let l in params.fields) {
-                    let field = params.fields[l]
-                    if (l>0) { newFieldsRight += ', '}
-                    newFieldsRight += this.getAliasField(field, params.schema[field], params.aliasRight)
+            let newFieldsRight = ''
+            for(let l in params.fields) {
+                let field = params.fields[l]
+                if (params.schema[field].hidden) {
+                    continue
                 }
-                params.fields = (newFieldsRight.length>0) ? newFieldsRight : '*'
+                if (l>0) {
+                    newFieldsRight += ', '
+                }
+                newFieldsRight += this.getAliasField(field, params.schema[field], params.aliasRight)
             }
+            params.fields = (newFieldsRight.length>0) ? newFieldsRight : '*'
+
 
             sql = sql.replace('fieldsRight', params.fields)
                 .replace('tableRight', params.tableRight)
@@ -638,17 +645,19 @@ class Finder extends Behavior {
 
                 // recuperando sql hasOne
                 if (this.associations.hasMany[assocName]) {
+                    const schemaHasMany = await this.getSchema(this.associations.hasMany[assocName].tableRight)
+                    if (!schemaHasMany) {
+                        throw new Error(__('Não foi possível recuperar o schema de '+assocName+' '+this.associations.hasMany[assocName].tableRight))
+                    }
+                    this.associations.hasMany[assocName].schema = schemaHasMany.schema
+                    
                     if (!!! this.associations.hasMany[assocName].fields) {
                         this.associations.hasMany[assocName].fields = []
-                        const schemaHasMany = await this.getSchema(this.associations.hasMany[assocName].tableRight)
-                        if (!schemaHasMany) {
-                            throw new Error(__('Não foi possível recuperar o schema de '+assocName+' '+this.associations.hasMany[assocName].tableRight))
-                        }
                         for(const fieldHasMany in schemaHasMany.fieldsType) {
-                            this.associations.hasMany[assocName].schema = schemaHasMany.schema
                             this.associations.hasMany[assocName].fields.push(fieldHasMany)
                         }
                     }
+                    
                     sqlJoin.hasMany[assocName] = this.getSqlHasMany(this.associations.hasMany[assocName])
                 }
             }
