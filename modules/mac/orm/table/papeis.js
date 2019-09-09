@@ -47,6 +47,19 @@ class Papeis extends Table {
             }
         }
     }
+
+    /**
+     * Método antes de validar
+     * - força o id da aplicação.
+     *
+     * @param   {Object}    data        Dados do registro.
+     * @return  {Boolean}   boolean     Verdadeiro se deve continuar, Falso se não.
+     */
+    async beforeValidate() {
+        this.data['PapeAplicacaoId'] = configure('codigo_sistema')
+
+        return true
+    }
 }
 
 module.exports = new Papeis()

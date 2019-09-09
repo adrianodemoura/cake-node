@@ -56,7 +56,19 @@ class Unidades extends Table {
                 unique: {msg: __("O nome '{nome}' já foi cadastrado !")}
             }
         }
+    }
 
+    /**
+     * Método antes de validar
+     * - força o id da aplicação.
+     *
+     * @param   {Object}    data        Dados do registro.
+     * @return  {Boolean}   boolean     Verdadeiro se deve continuar, Falso se não.
+     */
+    async beforeValidate() {
+        this.data['UnidAplicacaoId'] = configure('codigo_sistema')
+
+        return true
     }
 }
 
