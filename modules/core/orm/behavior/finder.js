@@ -282,8 +282,8 @@ class Finder extends Behavior {
                 throw new Error(__('Campos do lado direito inválidos!'))
             }
 
-            params.aliasRight = params.aliasRight || params.tableRight.fourAlias().capitalize()
-            params.aliasBridge= params.aliasBridge || params.tableBridge.fourAlias().capitalize()
+            params.aliasRight = params.aliasRight || params.tableRight.substr(0,4).capitalize()
+            params.aliasBridge= params.aliasBridge || params.tableBridge.substr(0,4).capitalize()
 
             sql = 'SELECT fieldsRight FROM tableRight aliasRight'
 
@@ -484,12 +484,12 @@ class Finder extends Behavior {
             }
 
             // sort
-            params.sort = !!!params.sort ? {} : params.sort
+            params.sort = params.sort || {}
             if (typeof params.sort === 'string') {
                 params.sort = getStringToJson(params.sort)
             }
             if (this.forcePkOrderBy) { // inserindo primaryKey na ordenação
-                if (!!!params.sort[pk]) {
+                if (!!!params.sort[pk] && pk) {
                     params.sort[pk] = 'ASC'
                 }
             }
@@ -526,17 +526,22 @@ class Finder extends Behavior {
             for (const loop in params.associations) {
                 const assocName = params.associations[loop]
 
-                // recuperando sql hasOne
-                if (this.associations.hasOne[assocName]) {
-                    if (!!! this.associations.hasOne[assocName].fields) {
-                        const schemaHasOne = await this.getSchema(this.associations.hasOne[assocName].tableRight)
-                        for(const fieldHasOne in schemaHasOne.fieldsType) {
-                            schemaFields[schemaHasOne.alias+'.'+fieldHasOne] = schemaHasOne.schema[fieldHasOne]
-                            params.fields.push(schemaHasOne.alias+'.'+fieldHasOne)
-                        }
-                    }
-                    sqlJoin.hasOne.push(this.getSqlHasOne(this.associations.hasOne[assocName]))
+                if (!!!this.associations.hasOne) {
+                    continue
                 }
+                if (!!!this.associations.hasOne[assocName]) {
+                    continue
+                }
+
+                // recuperando sql hasOne
+                if (!!! this.associations.hasOne[assocName].fields) {
+                    const schemaHasOne = await this.getSchema(this.associations.hasOne[assocName].tableRight)
+                    for(const fieldHasOne in schemaHasOne.fieldsType) {
+                        schemaFields[schemaHasOne.alias+'.'+fieldHasOne] = schemaHasOne.schema[fieldHasOne]
+                        params.fields.push(schemaHasOne.alias+'.'+fieldHasOne)
+                    }
+                }
+                sqlJoin.hasOne.push(this.getSqlHasOne(this.associations.hasOne[assocName]))
             }
 
             // renomeando campo a campo
@@ -601,6 +606,7 @@ class Finder extends Behavior {
             let sql = this.db.getSql(params, sqlJoin.hasOne)
             lista.itens = await this.query(sql)
             if (lista.itens === false) {
+                gravaLog(params, 'params_'+this.table)
                 throw new Error('07 - '+__('Erro ao recuperar a lista!'))
             }
 
@@ -632,7 +638,7 @@ class Finder extends Behavior {
                         this.associations.hasMany[assocName].fields = []
                         const schemaHasMany = await this.getSchema(this.associations.hasMany[assocName].tableRight)
                         if (!schemaHasMany) {
-                            throw new Error(__('Não foi possível recuperar o schema de '+assocName))
+                            throw new Error(__('Não foi possível recuperar o schema de '+assocName+' '+this.associations.hasMany[assocName].tableRight))
                         }
                         for(const fieldHasMany in schemaHasMany.fieldsType) {
                             this.associations.hasMany[assocName].schema = schemaHasMany.schema

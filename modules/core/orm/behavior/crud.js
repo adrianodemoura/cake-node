@@ -783,6 +783,10 @@ class Crud extends Behavior {
                 if (!!!params.associations.hasMany[Assoc]) {
                     continue
                 }
+                // hasMany precisa ter a tabela do meio
+                if (!!! params.associations.hasMany[Assoc].tableBridge) {
+                    continue
+                }
                 if (!!! params.associations.hasMany[Assoc].tableRight) {
                     throw new Error(__('O Parâmetro tableRight não foi informado na associação hasMany '+this.name+'.'+Assoc))
                 }
