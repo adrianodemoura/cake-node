@@ -24,7 +24,7 @@ class Papeis extends Table {
                     foreignKeyLeft:         'usuario_id',
                     tableRight:             'usuarios',
                     foreignKeyRight:        'id',
-                    fields:                 ['id', 'nome', 'email']
+                    fields:                 ['id', 'nome', 'email', 'acessos']
                 },
                 Perfis: {
                     module:                 'mac',
@@ -57,7 +57,6 @@ class Papeis extends Table {
      */
     async beforeValidate() {
         this.data['PapeAplicacaoId'] = configure('codigo_sistema')
-        gravaLog(this.data, 'dataPapel')
 
         return true
     }
@@ -65,6 +64,7 @@ class Papeis extends Table {
     /**
      * Método antes de salvar
      * - verifica duplicidade.
+     *
      * @param   {Object}    data    Dados do registro.
      * @return  {Boolean}   boolean     Verdadeiro se deve continuar, Falso se não.
      */
@@ -74,13 +74,22 @@ class Papeis extends Table {
         const idPerfil      = this.data['PapePerfilId']
         const idAplicacao   = this.data['PapeAplicacaoId']
 
-        if (! await this.verDupliciade()) {
+        if (await this.verDupliciade(idUsuario, idUnidade, idPerfil, idAplicacao)) {
+            this.error = __('Este papel já foi cadastratado!')
             return false
         }
 
         return true
     }
 
+    /**
+     * Verifica a duplicidade do papel.
+     *
+     * @param   {Integer}   idUsuario   id do usuário
+     * @param   {Integer}   idUnidade   id da unidade
+     * @param   {Integer}   idPerfil    id do perfil
+     * @return  {Boolean}   boolean     Verdadeiro se encontrou duplicidade, Falso se não.
+     */
     async verDupliciade(idUsuario=0, idUnidade=0, idPerfil=0, idAplicacao=0) {
 
         let params                  = {}
@@ -90,10 +99,9 @@ class Papeis extends Table {
         params.where['unidade_id']  = idUnidade
         params.where['perfil_id']   = idPerfil
 
-        const dataDup = await this.find(params)
-        gravaLog(dataDup, 'dataDup')
+        const totalDuplicidade = await this.find(params)
 
-        return false
+        return (totalDuplicidade>0) ? true : false
     }
 }
 

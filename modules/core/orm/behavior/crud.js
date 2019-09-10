@@ -420,7 +420,8 @@ class Crud extends Behavior {
                     for (let l in dataAssociation[Association]) {
                         let valueAssoc = dataAssociation[Association][l]
                         if (!!!valueAssoc) {
-                            throw new Error(__('Não foi possível recuperar o valor relacionado de %'+Association+'%'))
+                            continue
+                            //throw new Error(__('Não foi possível recuperar o valor relacionado de %'+Association+'%'))
                         }
                         tableInsert[tableBridge].push("INSERT INTO "+tableBridge+" ("+paramsAssociation.foreignKeyBridgeLeft+","+paramsAssociation.foreignKeyBridgeRight+") VALUES ("+vlrId+","+valueAssoc+")")
                     }
@@ -428,7 +429,8 @@ class Crud extends Behavior {
                     for (let l in tableInsert[tableBridge]) {
                         let valueAssoc = dataAssociation[Association][l]
                         if (!!!valueAssoc) {
-                            throw new Error(__('Não foi possível recuperar o valor relacionado de %'+Association+'%'))
+                            continue
+                            //throw new Error(__('Não foi possível recuperar o valor relacionado de %'+Association+'%'))
                         }
                         tableInsert[tableBridge][l] = tableInsert[tableBridge][l].replace(') VALUES', ','+paramsAssociation.foreignKeyBridgeRight+') VALUES')
                         tableInsert[tableBridge][l] = tableInsert[tableBridge][l].substr(0,tableInsert[tableBridge][l].length-1)+','+valueAssoc+')'

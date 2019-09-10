@@ -453,6 +453,7 @@ class Finder extends Behavior {
             let noCount     = false
             let pk          = this.primaryKey
             let schemaFields= objectClone(this.schema)
+            const sqlJoin   = {'hasOne': [], 'hasMany': []}
 
             // parâmetros obrigatório para a pesquisa
             params.limit        = params.limit          || 10
@@ -533,7 +534,6 @@ class Finder extends Behavior {
             }
 
             // configurando as associações
-            const sqlJoin = {'hasOne': [], 'hasMany': []}
             for (const loop in params.associations) {
                 const assocName = params.associations[loop]
 

@@ -69,5 +69,6 @@ module.exports = {
 	"Não foi possível recuperar o valor relacionado de %": "Could not retrieve related value from '%'",
 	'Erro ao tentar limpar relacionamentos!': 'Error trying to clear relationships!',
 	'Erro ao tentar salvar relacionamento!': 'Error trying to save relationships!',
-	'Tabela do lado direito inválida!': 'Invalid right side table!'
+	'Tabela do lado direito inválida!': 'Invalid right side table!',
+	'Este papel já foi cadastratado!': 'This paper already registred!'
 }
