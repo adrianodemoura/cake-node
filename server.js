@@ -16,6 +16,7 @@ require('./config/bootstrap')
 
 // iniciando app
 const app = express();
+app.disable('x-powered-by');
 
 // configurações do node
 process.env['NODE_ENV'] = ambiente.ambiente

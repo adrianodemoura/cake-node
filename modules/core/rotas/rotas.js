@@ -29,7 +29,7 @@ module.exports = app => {
         fs.readdirSync(MODULES).forEach(module => {
             if (fs.existsSync(MODULES+'/'+module+'/rotas/')) {
                 fs.readdirSync(MODULES + '/' + module + '/rotas/').forEach(file => {
-                    let rota = file.replace('.js', '')
+                    let rota = file.replace(/\.js$/, '')
                     if (ignorar.indexOf(rota) === -1) {
                         if (module === 'core') {
                             let method = readMethod(MODULES+'/'+module+'/rotas/'+file, fs)
@@ -87,7 +87,7 @@ module.exports = app => {
         let podePegar   = false
 
         let conteudo = fs.readFileSync(file).toString()
-        conteudo.split(/\r?\n/).forEach(function(line) {
+        conteudo.split(/\r?\n/).forEach((line) {
             if (line.indexOf('*/')>-1) {
                 podePegar = false
                 return
@@ -97,7 +97,7 @@ module.exports = app => {
             }
             if (line.indexOf('/**')>-1) {
                 loop++
-                if (loop==2) {
+                if (loop === 2) {
                     podePegar = true
                 }
             }

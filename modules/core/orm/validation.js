@@ -134,7 +134,7 @@ class Validation {
         if ((Resto == 10) || (Resto == 11)) {
             Resto = 0
         }
-        if (Resto != parseInt(value.substring(9, 10)) ) {
+        if (Resto !== parseInt(value.substring(9, 10)) ) {
             return false
         }
        

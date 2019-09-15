@@ -49,7 +49,7 @@ class Finder extends Behavior {
      */
     getFieldName (aliasField='') {
       let fieldName   = aliasField
-      const arrFields = aliasField.replace(/([A-Z])/g, ' $1').trim().replace(' ','.').replace(' ','_').toLowerCase().split('.')
+      const arrFields = aliasField.replace(/([A-Z])/g, ' $1').trim().replace(/ /,'.').replace(/ /,'_').toLowerCase().split('.')
       fieldName       = arrFields[1] || ''
 
       return fieldName
