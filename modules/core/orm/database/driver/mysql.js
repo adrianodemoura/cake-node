@@ -303,7 +303,7 @@ class db {
                 if (indices.length>0 || params.pk.length>0 || fields.length>0) {
                     indices += ', '
                 }
-                let typeIndex = (params.fields[field].index.toString().toLowerCase() == 'unique') ? 'UNIQUE' : 'KEY'
+                let typeIndex = (params.fields[field].index.toString().toLowerCase() === 'unique') ? 'UNIQUE' : 'KEY'
                 indices += typeIndex+' i_'+params.table.toLowerCase()+'_'+field.toLowerCase()+' ('+field+')'
             }
 
