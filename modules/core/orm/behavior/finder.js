@@ -144,7 +144,9 @@ class Finder extends Behavior {
                 field       = arrField[1].trim()
             }
             if (!!!this.schema[field]) {
-                field = field.replace(this.alias,'').toLowerCase()
+                field = field.replace(this.alias,'')
+                field = field.replace(/([A-Z])/g, '_'+' $1').replace(/\ /g,'').replace('_','')
+                field = field.toLowerCase()
             }
 
             if (!!!this.schema[field]) {
@@ -281,13 +283,16 @@ class Finder extends Behavior {
             if (!!!params.fields) {
                 throw new Error(__('Campos do lado direito inválidos!'))
             }
+            if (!!!params.schema) {
+                throw new Error(__('Esquema inválido!'))
+            }
 
-            params.aliasRight = params.aliasRight || params.tableRight.fourAlias().capitalize()
-            params.aliasBridge= params.aliasBridge || params.tableBridge.fourAlias().capitalize()
+            params.aliasRight = params.aliasRight || params.tableRight.humanize().fourAlias()
 
             sql = 'SELECT fieldsRight FROM tableRight aliasRight'
 
             if (params.tableBridge) {
+                params.aliasBridge = params.aliasBridge || params.tableBridge.humanize().fourAlias()
                 sql += ' LEFT JOIN tableBridge aliasBridge ON aliasBridge.foreignKeyBridgeRight = aliasRight.foreignKeyRight'
                 if (params.includeJoin) {
                     for (let i in params.includeJoin) {
@@ -304,15 +309,19 @@ class Finder extends Behavior {
                 sql += ' WHERE aliasRight.foreignKeyRight = valueKey'
             }
 
-            if (params.fields.constructor.name !== 'String') {
-                let newFieldsRight = ''
-                for(let l in params.fields) {
-                    let field = params.fields[l]
-                    if (l>0) { newFieldsRight += ', '}
-                    newFieldsRight += this.getAliasField(field, params.schema[field], params.aliasRight)
+            let newFieldsRight = ''
+            for(let l in params.fields) {
+                let field = params.fields[l]
+                if (params.schema[field].hidden) {
+                    continue
                 }
-                params.fields = (newFieldsRight.length>0) ? newFieldsRight : '*'
+                if (l>0) {
+                    newFieldsRight += ', '
+                }
+                newFieldsRight += this.getAliasField(field, params.schema[field], params.aliasRight)
             }
+            params.fields = (newFieldsRight.length>0) ? newFieldsRight : '*'
+
 
             sql = sql.replace('fieldsRight', params.fields)
                 .replace('tableRight', params.tableRight)
@@ -329,7 +338,6 @@ class Finder extends Behavior {
             if (this.debug) {
                 console.log(this.error)
             }
-            console.log(this.error)
             sql = ''
         }
 
@@ -445,6 +453,7 @@ class Finder extends Behavior {
             let noCount     = false
             let pk          = this.primaryKey
             let schemaFields= objectClone(this.schema)
+            const sqlJoin   = {'hasOne': [], 'hasMany': []}
 
             // parâmetros obrigatório para a pesquisa
             params.limit        = params.limit          || 10
@@ -479,17 +488,20 @@ class Finder extends Behavior {
             if (typeof params.where === 'string') {
                 params.where = this.getJsonSqlWhere(params.where)
                 if (params.where === false) {
+                    if (this.debug) {
+                        console.log(params.where)
+                    }
                     throw new Error('04 - '+this.error)
                 }
             }
 
             // sort
-            params.sort = !!!params.sort ? {} : params.sort
+            params.sort = params.sort || {}
             if (typeof params.sort === 'string') {
                 params.sort = getStringToJson(params.sort)
             }
             if (this.forcePkOrderBy) { // inserindo primaryKey na ordenação
-                if (!!!params.sort[pk]) {
+                if (!!!params.sort[pk] && pk) {
                     params.sort[pk] = 'ASC'
                 }
             }
@@ -522,21 +534,25 @@ class Finder extends Behavior {
             }
 
             // configurando as associações
-            const sqlJoin = {'hasOne': [], 'hasMany': []}
             for (const loop in params.associations) {
                 const assocName = params.associations[loop]
 
-                // recuperando sql hasOne
-                if (this.associations.hasOne[assocName]) {
-                    if (!!! this.associations.hasOne[assocName].fields) {
-                        const schemaHasOne = await this.getSchema(this.associations.hasOne[assocName].tableRight)
-                        for(const fieldHasOne in schemaHasOne.fieldsType) {
-                            schemaFields[schemaHasOne.alias+'.'+fieldHasOne] = schemaHasOne.schema[fieldHasOne]
-                            params.fields.push(schemaHasOne.alias+'.'+fieldHasOne)
-                        }
-                    }
-                    sqlJoin.hasOne.push(this.getSqlHasOne(this.associations.hasOne[assocName]))
+                if (!!!this.associations.hasOne) {
+                    continue
                 }
+                if (!!!this.associations.hasOne[assocName]) {
+                    continue
+                }
+
+                // recuperando sql hasOne
+                if (!!! this.associations.hasOne[assocName].fields) {
+                    const schemaHasOne = await this.getSchema(this.associations.hasOne[assocName].tableRight)
+                    for(const fieldHasOne in schemaHasOne.fieldsType) {
+                        schemaFields[schemaHasOne.alias+'.'+fieldHasOne] = schemaHasOne.schema[fieldHasOne]
+                        params.fields.push(schemaHasOne.alias+'.'+fieldHasOne)
+                    }
+                }
+                sqlJoin.hasOne.push(this.getSqlHasOne(this.associations.hasOne[assocName]))
             }
 
             // renomeando campo a campo
@@ -601,6 +617,7 @@ class Finder extends Behavior {
             let sql = this.db.getSql(params, sqlJoin.hasOne)
             lista.itens = await this.query(sql)
             if (lista.itens === false) {
+                gravaLog(params, 'params_'+this.table)
                 throw new Error('07 - '+__('Erro ao recuperar a lista!'))
             }
 
@@ -628,24 +645,27 @@ class Finder extends Behavior {
 
                 // recuperando sql hasOne
                 if (this.associations.hasMany[assocName]) {
+                    const schemaHasMany = await this.getSchema(this.associations.hasMany[assocName].tableRight)
+                    if (!schemaHasMany) {
+                        throw new Error(__('Não foi possível recuperar o schema de '+assocName+' '+this.associations.hasMany[assocName].tableRight))
+                    }
+                    this.associations.hasMany[assocName].schema = schemaHasMany.schema
+                    
                     if (!!! this.associations.hasMany[assocName].fields) {
                         this.associations.hasMany[assocName].fields = []
-                        const schemaHasMany = await this.getSchema(this.associations.hasMany[assocName].tableRight)
-                        if (!schemaHasMany) {
-                            throw new Error(__('Não foi possível recuperar o schema de '+assocName))
-                        }
                         for(const fieldHasMany in schemaHasMany.fieldsType) {
-                            this.associations.hasMany[assocName].schema = schemaHasMany.schema
                             this.associations.hasMany[assocName].fields.push(fieldHasMany)
                         }
                     }
+                    
                     sqlJoin.hasMany[assocName] = this.getSqlHasMany(this.associations.hasMany[assocName])
                 }
             }
             for (let assocHasMany in sqlJoin.hasMany) {
                 for (let loopItens in lista.itens) {
                     let sqlHasMany      = sqlJoin.hasMany[assocHasMany]
-                    const fieldLeft     = (this.alias+'_'+this.primaryKey).capitalize().humanize()
+                    const nameFieldLeft = this.associations.hasMany[assocHasMany].foreignKeyLeft
+                    const fieldLeft     = (this.alias+'_'+nameFieldLeft).capitalize().humanize()
                     const valueKey      = lista.itens[loopItens][fieldLeft]
 
                     if (sqlHasMany.length>0) {

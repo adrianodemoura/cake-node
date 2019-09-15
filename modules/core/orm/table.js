@@ -84,6 +84,8 @@ class Table {
         const Cache             = require (CORE + '/lib/cache.js')
         const schemaCacheName   = table.length>0 ? 'schema_'+table.toLowerCase() : 'schema_'+this.table
         let schema              = Cache.read(schemaCacheName)
+        
+        // primeiro tenta hasOne
         if (!!!schema.alias) {
             for (const assocName in this.associations.hasOne) {
                 const tableRight = this.associations.hasOne[assocName].tableRight
@@ -94,6 +96,8 @@ class Table {
                 }
             }
         }
+
+        // se não deu certo, tenta hasMany
         if (!!!schema.alias) {
             for (const assocName in this.associations.hasMany) {
                 const tableRight = this.associations.hasMany[assocName].tableRight
@@ -105,7 +109,7 @@ class Table {
             }
         }
 
-        return (schema === {} ) ? schema : false
+        return schema
     }
 
     /**
@@ -182,6 +186,7 @@ class Table {
     async setSchema(table='') {
 
         await this.init()
+        this.table              = table.length>0 ? table : this.table
         this.alias              = this.table.humanize().fourAlias()
 
         const Cache             = require (CORE + '/lib/cache.js')
@@ -195,7 +200,7 @@ class Table {
 
             const schema = require(MODULES + '/' + this.module.toLowerCase() + '/orm/schema/' + this.schemaName.toLowerCase())
 
-            schemaCache.schema          = schema.schema
+            schemaCache.schema = schema.schema
 
             for (let field in schemaCache.schema) {
                 if (typeof (schemaCache.schema[field].pk) !== 'undefined') { // primary key

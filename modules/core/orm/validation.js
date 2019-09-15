@@ -20,6 +20,7 @@ class Validation {
         this.Table = Table
         this.validation = {
             'field': {
+                number:     {msg: ''},
                 string:     {msg: ''},
                 unique:     {msg: ''},
                 email:      {msg: ''},

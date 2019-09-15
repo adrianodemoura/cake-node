@@ -24,8 +24,7 @@ class Usuario extends Schema {
             width: 11,
             pk: true,
             comment: 'chave primária',
-            index: true,
-            hidden: true,
+            index: true
         }
         this.schema.nome = {
             title: __('Usuário'),

@@ -28,12 +28,6 @@ class Usuarios extends Table {
                 }
             },
             hasMany: {
-                Papeis: {
-                    module:                 'mac',
-                    foreignKeyLeft:         'id',
-                    tableRight:             'papeis',
-                    foreignKeyRight:        'usuario_id'
-                },
                 Perfis: {
                     module:                 'mac',
                     foreignKeyLeft:         'id',
@@ -126,6 +120,14 @@ class Usuarios extends Table {
         if (this.validationType === 'create') {
             this.data['UsuaToken'] = geraToken()
         }
+
+        if (this.data['Perfis'] && !!!this.data['Unidades']) {
+            throw new Error(__('O total de Perfis está diferente do total de Unidades!'))
+        }
+        if (this.data['Unidades'] && !!!this.data['Perfis']) {
+            throw new Error(__('O total de Unidades está diferente do total de Perfis!'))
+        }
+
         if (this.data['Perfis'] || this.data['Unidades']) {
             const totPerfis     = (this.data['Perfis'].split(',').length)
             const totUnidades   = (this.data['Unidades'].split(',').length)
