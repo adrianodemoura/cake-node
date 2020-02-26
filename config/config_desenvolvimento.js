@@ -16,7 +16,7 @@ module.exports = {
 	'log_sql': true,
 	'debug': true,
 	"data_sources": {
-		"sqlite": {
+		"default": {
 			driver: 'sqlite3', 
 			host: "localhost", 
 			user: "cakenode_us", 
@@ -26,7 +26,7 @@ module.exports = {
 			dateFormat: "strftime('%d/%m/%Y', {field})",
 			dateTimeFormat: "strftime('%d/%m/%Y %H:%M:%S', {field})"
 		},
-		"default": {
+		"mysql": {
 			driver: 'mysql', 
 			host: "localhost", 
 			user: "cakenode_us", 

@@ -13,5 +13,5 @@ module.exports = {
   "versao": "0.7",
   "sistema": "cakeNode",
   "codigo_sistema": 0,
-  "salt": ""
+  "salt": "n&%1o*2v(3o-4s5a@%l86t7#a7_#!"
 }

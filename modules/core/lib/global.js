@@ -11,7 +11,7 @@
  */
 global.configure = function(tag='') {
     tag             = tag.toLowerCase()
-    const config    = require (ROOT + '/config/config')
+    const config    = require (ROOT + '/config/config_default')
     let vlr         = config[tag] || false
 
     if (! vlr ) {

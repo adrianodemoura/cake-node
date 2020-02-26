@@ -26,7 +26,7 @@ $ node server.js
 
 Acesse a rota:
 
-`/instalacao`
+`http://localhost:3000/instalacao`
 
 Informe o e-mail e senha do usuário administrador, o sistema irá gerar um token para este usuário, a partir daí, é possível acessar as demais rotas, veja mais sobre rotas no ítem `Principais rotas`.
 
