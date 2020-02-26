@@ -7,7 +7,7 @@ Mini framework feito em NodeJS baseado no cakePHP.
 ## Considerações
 `CakeNode` é um exemplo de API, bem simples, feito em nodeJs. 
 Todas as rotas são autenticadas por Token. Cada novo usuário possui um.
-Novas rotas podem ser implementadas no diretório `rotas` de cada módulo.
+Novas rotas podem ser implementadas no diretório `rotas` dentro de cada módulo (diretório `modules`).
 
 ### Requisitos
 - node, nodemon e npm
@@ -16,9 +16,9 @@ Novas rotas podem ser implementadas no diretório `rotas` de cada módulo.
 ### Instalação
 ```sh
 $ cd {seus_projetos_nodeJs}
-$ git clone https://github.com/adrianodemoura/cake-node.git api-node
+$ git clone https://github.com/adrianodemoura/cake-node.git cake-node
 ou
-$ git clone git@github.com:adrianodemoura/cake-node.git api-node
+$ git clone git@github.com:adrianodemoura/cake-node.git cake-node
 $ cd cake-node
 $ npm install
 $ node server.js 
